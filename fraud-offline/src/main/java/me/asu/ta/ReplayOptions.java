@@ -2,12 +2,12 @@ package me.asu.ta;
 
 import java.util.Locale;
 
-final class ReplayOptions {
-    final int bucketMin;
-    final String bucketBy;
-    final boolean quoteAgeStats;
-    final String quoteAgeScope;
-    final int quoteAgeMaxSamplesPerKey;
+public final class ReplayOptions {
+    private final int bucketMin;
+    private final String bucketBy;
+    private final boolean quoteAgeStats;
+    private final String quoteAgeScope;
+    private final int quoteAgeMaxSamplesPerKey;
 
     ReplayOptions(
             int bucketMin,
@@ -28,5 +28,25 @@ final class ReplayOptions {
         }
         String normalized = value.trim().toLowerCase(Locale.ROOT);
         return normalized.isEmpty() ? fallback : normalized;
+    }
+
+    public int getBucketMin() {
+        return bucketMin;
+    }
+
+    public String getBucketBy() {
+        return bucketBy;
+    }
+
+    public boolean isQuoteAgeStats() {
+        return quoteAgeStats;
+    }
+
+    public String getQuoteAgeScope() {
+        return quoteAgeScope;
+    }
+
+    public int getQuoteAgeMaxSamplesPerKey() {
+        return quoteAgeMaxSamplesPerKey;
     }
 }

@@ -15,7 +15,7 @@ public class FxReplayWriter {
     private FxReplayWriter() {}
 
     /** 写出文本版风险报告（全局基线 + TopN 异常账户）。 */
-    static void writeReport(Path out, List<Anomaly> anomalies, int topN,
+    public static void writeReport(Path out, List<Anomaly> anomalies, int topN,
             double gMean500, double gStd500, double gMeanQA, double gStdQA) throws Exception {
         try (BufferedWriter bw = Files.newBufferedWriter(out)) {
             bw.write("FX Execution Risk Analysis Report\n");
@@ -40,7 +40,7 @@ public class FxReplayWriter {
     }
 
     /** 将 z-score 映射为离散风险级别描述。 */
-    static String riskLevel(double z) {
+    public static String riskLevel(double z) {
         if (z > 5) return "HIGH";
         if (z > 3) return "MEDIUM";
         if (z > 2) return "LOW";
@@ -48,7 +48,7 @@ public class FxReplayWriter {
     }
 
     /** 写逐笔明细 CSV。 */
-    static void writeDetail(Path out, List<DetailRow> rows) throws IOException {
+    public static void writeDetail(Path out, List<DetailRow> rows) throws IOException {
         try (CsvWriter writer = new CsvWriter(out.toString(), ',', StandardCharsets.UTF_8)) {
             writer.writeRecord(new String[]{"account_id", "symbol", "side", "exec_time_ms",
                     "size", "mid_t0", "last_quote_time_t0", "quote_age_ms", "mid_100ms", "markout_100ms",
@@ -73,7 +73,7 @@ public class FxReplayWriter {
     }
 
     /** 写 account|symbol 聚合 CSV（按 500ms 平均 markout 降序）。 */
-    static void writeAggAccountSymbol(Path out, Map<String, Agg> agg) throws IOException {
+    public static void writeAggAccountSymbol(Path out, Map<String, Agg> agg) throws IOException {
         List<Map.Entry<String, Agg>> list = new ArrayList<>(agg.entrySet());
         list.sort((a, b) -> Double.compare(
                 me.asu.ta.util.CommonUtils.avg(b.getValue().sumMark500, b.getValue().n),
@@ -106,7 +106,7 @@ public class FxReplayWriter {
      * 写 account 聚合 CSV。
      * 附加输出统一风险分数（0-100）与风险等级，并按风险分数降序。
      */
-    static BaselineStats writeAggAccount(Path out, Map<String, Agg> aggAccount, int minTrades, Agg global) throws IOException {
+    public static BaselineStats writeAggAccount(Path out, Map<String, Agg> aggAccount, int minTrades, Agg global) throws IOException {
         List<Map.Entry<String, Agg>> list = new ArrayList<>(aggAccount.entrySet());
 
         // 计算基线统计并返回，避免调用方重复计算
@@ -190,7 +190,7 @@ public class FxReplayWriter {
     }
 
     /** 写时间桶聚合 CSV（按桶起始时间升序）。 */
-    static void writeBuckets(Path out, int bucketMin, String bucketBy, Map<String, Agg> buckets) throws IOException {
+    public static void writeBuckets(Path out, int bucketMin, String bucketBy, Map<String, Agg> buckets) throws IOException {
         List<Map.Entry<String, Agg>> list = new ArrayList<>(buckets.entrySet());
         list.sort(Comparator.comparingLong(e -> me.asu.ta.util.CommonUtils.parseBucketStartFromKey(e.getKey())));
         try (CsvWriter writer = new CsvWriter(out.toString(), ',', StandardCharsets.UTF_8)) {
@@ -218,7 +218,7 @@ public class FxReplayWriter {
     }
 
     /** 写 quote_age 分位数统计 CSV（p50/p90/p99/mean）。 */
-    static void writeQuoteAgeStats(Path out, String scope, Map<String, LongSamples> samples) throws IOException {
+    public static void writeQuoteAgeStats(Path out, String scope, Map<String, LongSamples> samples) throws IOException {
         List<String> keys = new ArrayList<>(samples.keySet());
         Collections.sort(keys);
         try (CsvWriter writer = new CsvWriter(out.toString(), ',', StandardCharsets.UTF_8)) {
@@ -244,7 +244,7 @@ public class FxReplayWriter {
     }
 
     /** 写全局 baseline CSV（从 BaselineStats 对象）。 */
-    static void writeBaseline(Path out, BaselineStats baseline) throws IOException {
+    public static void writeBaseline(Path out, BaselineStats baseline) throws IOException {
         try (CsvWriter writer =new CsvWriter(out.toString(), ',', StandardCharsets.UTF_8)) {
             writer.writeRecord(new String[]{"scope", "avg_markout_100ms", "avg_markout_500ms",
                     "avg_markout_1s", "avg_markout_5s", "avg_quote_age_ms",
@@ -268,7 +268,7 @@ public class FxReplayWriter {
      * 写bot检测指标专项CSV（账户级别）。
      * 输出每个账户的综合bot检测指标，便于筛选高风险账户。
      */
-    static void writeBotIndicators(Path out, Map<String, OfflineAccountTracker> trackers) throws IOException {
+    public static void writeBotIndicators(Path out, Map<String, OfflineAccountTracker> trackers) throws IOException {
         // 按botScore降序排序
         List<Map.Entry<String, OfflineAccountTracker>> list = new ArrayList<>(trackers.entrySet());
         list.sort((a, b) -> Integer.compare(

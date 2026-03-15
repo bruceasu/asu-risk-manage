@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class ReplayState {
+public class ReplayState {
     final Agg globalAgg = new Agg();
     final List<DetailRow> detailRows = new ArrayList<>(200_000);
     final Map<String, Agg> aggByAccountSymbol = new HashMap<>();
@@ -19,4 +19,32 @@ class ReplayState {
     
     // 新增：存储每个账户的bot检测追踪器
     final Map<String, OfflineAccountTracker> accountTrackers = new HashMap<>();
+
+    public Agg getGlobalAgg() {
+        return globalAgg;
+    }
+
+    public List<DetailRow> getDetailRows() {
+        return detailRows;
+    }
+
+    public Map<String, Agg> getAggByAccountSymbol() {
+        return aggByAccountSymbol;
+    }
+
+    public Map<String, Agg> getAggByAccount() {
+        return aggByAccount;
+    }
+
+    public Map<String, Agg> getBuckets() {
+        return buckets;
+    }
+
+    public Map<String, LongSamples> getQuoteAgeSamples() {
+        return quoteAgeSamples;
+    }
+
+    public Map<String, OfflineAccountTracker> getAccountTrackers() {
+        return accountTrackers;
+    }
 }

@@ -22,7 +22,7 @@ public record IntervalStats(
      * 从时间间隔数组计算统计指标
      * @param deltas 时间间隔数组（毫秒）
      */
-    static IntervalStats compute(long[] deltas) {
+    public static IntervalStats compute(long[] deltas) {
         if (deltas == null || deltas.length == 0) {
             return EMPTY;
         }
@@ -75,14 +75,14 @@ public record IntervalStats(
      * 判断是否为机器人特征
      * 判断标准：CV < 0.15（极低变异系数）且有大量快速订单
      */
-    boolean isBotLike() {
+    public boolean isBotLike() {
         return cv < 0.15 && pctLt500ms > 0.5;
     }
     
     /**
      * 判断是否为高频交易模式
      */
-    boolean isHighFrequency() {
+    public boolean isHighFrequency() {
         return mean < 2000 && pctLt1s > 0.6;
     }
 }

@@ -5,16 +5,16 @@ package me.asu.ta;
  * 避免在多个地方重复计算相同的基线指标。
  */
 public class BaselineStats {
-    final double mean100;
-    final double std100;
-    final double mean500;
-    final double std500;
-    final double mean1s;
-    final double std1s;
-    final double mean5s;
-    final double std5s;
-    final double meanQA;
-    final double stdQA;
+    public final double mean100;
+    public final double std100;
+    public final double mean500;
+    public final double std500;
+    public final double mean1s;
+    public final double std1s;
+    public final double mean5s;
+    public final double std5s;
+    public final double meanQA;
+    public final double stdQA;
 
     public BaselineStats(Agg global) {
         this.mean100 = me.asu.ta.util.CommonUtils.mean(global.sumMark100, global.n);

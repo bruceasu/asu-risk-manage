@@ -14,7 +14,7 @@ import java.util.*;
  * - 累积订单大小和TPSL设置，分析模式和熵值。
  * - 提供综合bot评分接口，结合多个维度的统计结果。
  */
-final class OfflineAccountTracker {
+public final class OfflineAccountTracker {
 
     private final List<Long> orderTimes = new ArrayList<>();
     private final PriceDeviationTracker priceDeviation = new PriceDeviationTracker();
@@ -26,12 +26,12 @@ final class OfflineAccountTracker {
     private IntervalStats cachedStats = null;
     private boolean statsNeedUpdate = true;
 
-    void addOrderTime(long ts) {
+    public void addOrderTime(long ts) {
         orderTimes.add(ts);
         statsNeedUpdate = true;
     }
 
-    void addEventText(EventText et, double execPrice, String side) {
+    public void addEventText(EventText et, double execPrice, String side) {
         if (et != null) {
             if (et.requestPrice != null) {
                 priceDeviation.add(et.requestPrice, BigDecimal.valueOf(execPrice));
@@ -43,13 +43,13 @@ final class OfflineAccountTracker {
         }
     }
 
-    void addOrderSize(double size) {
+    public void addOrderSize(double size) {
         if (size > 0) {
             sizeAnalyzer.add(BigDecimal.valueOf(size));
         }
     }
 
-    void addTimeDiff(long diff) {
+    public void addTimeDiff(long diff) {
         timeDiffAnalyzer.add(diff);
     }
 
@@ -65,14 +65,14 @@ final class OfflineAccountTracker {
         return timeDiffAnalyzer.median();
     }
 
-    void addTPSL(Double tp, Double sl, double execPrice, String side) {
+    public void addTPSL(Double tp, Double sl, double execPrice, String side) {
         BigDecimal price = BigDecimal.valueOf(execPrice);
         BigDecimal tpBD = tp != null ? BigDecimal.valueOf(tp) : null;
         BigDecimal slBD = sl != null ? BigDecimal.valueOf(sl) : null;
         tpslPattern.add(price, tpBD, slBD);
     }
 
-    IntervalStats computeStats() {
+    public IntervalStats computeStats() {
         if (!statsNeedUpdate && cachedStats != null) {
             return cachedStats;
         }
@@ -96,19 +96,19 @@ final class OfflineAccountTracker {
         return cachedStats;
     }
 
-    double getEntropy() {
+    public double getEntropy() {
         return sizeAnalyzer.entropy();
     }
 
-    double getTPSLRatio() {
+    public double getTPSLRatio() {
         return 1.0 - tpslPattern.noTPSLRatio();
     }
 
-    int getClientIPCount() {
+    public int getClientIPCount() {
         return clientFingerprint.uniqueIps();
     }
 
-    String getClientTypes() {
+    public String getClientTypes() {
         if (localClientTypes.isEmpty()) {
             return "";
         }
@@ -117,19 +117,19 @@ final class OfflineAccountTracker {
         return String.join("|", sorted);
     }
 
-    int getLoginNameCount() {
+    public int getLoginNameCount() {
         return clientFingerprint.uniqueLoginNames();
     }
 
-    double getAvgPriceDeviation() {
+    public double getAvgPriceDeviation() {
         return priceDeviation.avgDeviation();
     }
 
-    int getTotalOrders() {
+    public int getTotalOrders() {
         return orderTimes.size();
     }
 
-    int computeBotScore() {
+    public int computeBotScore() {
         IntervalStats stats = computeStats();
         if (stats == null || !stats.isBotLike()) {
             return 0;

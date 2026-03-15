@@ -11,21 +11,22 @@ import static me.asu.ta.util.CommonUtils.parseDouble;
 import static me.asu.ta.util.CommonUtils.parseInt;
 import static me.asu.ta.util.CommonUtils.require;
 
-final class FxReplayCliOptions {
-    final Path tradesPath;
-    final Path quotesPath;
-    final ReplayOptions replay;
-    final OutputOptions outputs;
-    final boolean aggAccount;
-    final boolean cluster;
-    final int clusterK;
-    final double clusterThreshold;
-    final boolean baseline;
-    final boolean report;
-    final int topN;
-    final int minTrades;
-    final boolean charts;
-    final int chartTopN;
+public final class FxReplayCliOptions {
+    private final Path tradesPath;
+    private final Path quotesPath;
+    private final ReplayOptions replay;
+    private final OutputOptions outputs;
+    private final boolean aggAccount;
+    private final boolean cluster;
+    private final int clusterK;
+    private final double clusterThreshold;
+    private final boolean baseline;
+    private final boolean report;
+    private final int topN;
+    private final int minTrades;
+    private final boolean charts;
+    private final int chartTopN;
+    private final boolean integrateCurrentSystem;
 
     private FxReplayCliOptions(
             Path tradesPath,
@@ -41,7 +42,8 @@ final class FxReplayCliOptions {
             int topN,
             int minTrades,
             boolean charts,
-            int chartTopN) {
+            int chartTopN,
+            boolean integrateCurrentSystem) {
         this.tradesPath = tradesPath;
         this.quotesPath = quotesPath;
         this.replay = replay;
@@ -56,16 +58,18 @@ final class FxReplayCliOptions {
         this.minTrades = minTrades;
         this.charts = charts;
         this.chartTopN = chartTopN;
+        this.integrateCurrentSystem = integrateCurrentSystem;
     }
 
-    static FxReplayCliOptions fromArgs(String[] args) {
+    public static FxReplayCliOptions fromArgs(String[] args) {
         validatePresenceFlags(args, List.of(
                 "--agg-account",
                 "--quoteage-stats",
                 "--cluster",
                 "--baseline",
                 "--report",
-                "--charts"
+                "--charts",
+                "--integrate-current-system"
         ));
         return fromCli(parseArgs(args));
     }
@@ -102,7 +106,8 @@ final class FxReplayCliOptions {
                 intv(cli, "--top-n", 20),
                 intv(cli, "--min-trades", 0),
                 hasFlag(cli, "--charts"),
-                intv(cli, "--chart-top-n", 20)
+                intv(cli, "--chart-top-n", 20),
+                hasFlag(cli, "--integrate-current-system")
         );
     }
 
@@ -133,5 +138,65 @@ final class FxReplayCliOptions {
             return Paths.get(outDir).resolve(defaultFileName);
         }
         return Paths.get(defaultFileName);
+    }
+
+    public Path getTradesPath() {
+        return tradesPath;
+    }
+
+    public Path getQuotesPath() {
+        return quotesPath;
+    }
+
+    public ReplayOptions getReplay() {
+        return replay;
+    }
+
+    public OutputOptions getOutputs() {
+        return outputs;
+    }
+
+    public boolean isAggAccount() {
+        return aggAccount;
+    }
+
+    public boolean isCluster() {
+        return cluster;
+    }
+
+    public int getClusterK() {
+        return clusterK;
+    }
+
+    public double getClusterThreshold() {
+        return clusterThreshold;
+    }
+
+    public boolean isBaseline() {
+        return baseline;
+    }
+
+    public boolean isReport() {
+        return report;
+    }
+
+    public int getTopN() {
+        return topN;
+    }
+
+    public int getMinTrades() {
+        return minTrades;
+    }
+
+    public boolean isCharts() {
+        return charts;
+    }
+
+    public int getChartTopN() {
+        return chartTopN;
+    }
+
+    public boolean isIntegrateCurrentSystem() {
+        return integrateCurrentSystem;
     }
 }

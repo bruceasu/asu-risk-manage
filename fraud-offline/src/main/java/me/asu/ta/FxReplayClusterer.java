@@ -154,7 +154,7 @@ import java.util.*;
  * @see AccountVec 账户特征向量
  * @see Cluster 聚类簇
  */
-final class FxReplayClusterer {
+public final class FxReplayClusterer {
     /** 工具类，不允许实例化。 */
     private FxReplayClusterer() {}
 
@@ -179,7 +179,7 @@ final class FxReplayClusterer {
      * @see #kMeans(List, int, int)
      * @see #thresholdClustering(List, double)
      */
-    static void clusterAccountsAndWrite(Path out, Map<String, Agg> aggByAccount, int k,
+    public static void clusterAccountsAndWrite(Path out, Map<String, Agg> aggByAccount, int k,
             double threshold, int minTrades) throws IOException {
         List<AccountVec> vecs = aggByAccount.entrySet().stream()
                 .filter(e -> e.getValue().n >= minTrades)
@@ -216,7 +216,7 @@ final class FxReplayClusterer {
      * @see #cosine(double[], double[])
      * @see #recomputeCentroid(Cluster)
      */
-    static List<Cluster> thresholdClustering(List<AccountVec> vecs, double threshold) {
+    public static List<Cluster> thresholdClustering(List<AccountVec> vecs, double threshold) {
         List<Cluster> clusters = new ArrayList<>();
         for (AccountVec v : vecs) {
             Cluster best = null;
@@ -255,7 +255,7 @@ final class FxReplayClusterer {
      * @param c 待重算的簇（会直接修改其 centroid 字段）
      * @see me.asu.ta.util.CommonUtils#l2(double[])
      */
-    static void recomputeCentroid(Cluster c) {
+    public static void recomputeCentroid(Cluster c) {
         Arrays.fill(c.centroid, 0);
         for (AccountVec v : c.members) {
             for (int i = 0; i < c.centroid.length; i++) c.centroid[i] += v.x[i];
@@ -292,7 +292,7 @@ final class FxReplayClusterer {
      * @see #cosine(double[], double[])
      * @see #recomputeCentroid(Cluster)
      */
-    static List<Cluster> kMeans(List<AccountVec> vecs, int k, int iters) {
+    public static List<Cluster> kMeans(List<AccountVec> vecs, int k, int iters) {
         if (vecs.isEmpty()) return List.of();
         k = Math.min(k, vecs.size());
         List<Cluster> clusters = new ArrayList<>();
@@ -335,7 +335,7 @@ final class FxReplayClusterer {
      * @param b 第二个向量（已归一化）
      * @return 余弦相似度（点积），范围 [0, 1]
      */
-    static double cosine(double[] a, double[] b) {
+    public static double cosine(double[] a, double[] b) {
         double s = 0;
         int n = Math.min(a.length, b.length);
         for (int i = 0; i < n; i++) s += a[i] * b[i];

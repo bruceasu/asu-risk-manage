@@ -2,17 +2,17 @@ package me.asu.ta;
 
 import java.nio.file.Path;
 
-final class OutputOptions {
-    final Path detail;
-    final Path aggAccountSymbol;
-    final Path aggAccount;
-    final Path bucket;
-    final Path quoteAge;
-    final Path baseline;
-    final Path cluster;
-    final Path report;
-    final Path chart;
-    final Path botIndicators;
+public final class OutputOptions {
+    private final Path detail;
+    private final Path aggAccountSymbol;
+    private final Path aggAccount;
+    private final Path bucket;
+    private final Path quoteAge;
+    private final Path baseline;
+    private final Path cluster;
+    private final Path report;
+    private final Path chart;
+    private final Path botIndicators;
 
     OutputOptions(
             Path detail,
@@ -35,5 +35,45 @@ final class OutputOptions {
         this.report = report;
         this.chart = chart;
         this.botIndicators = botIndicators;
+    }
+
+    public Path getDetail() {
+        return detail;
+    }
+
+    public Path getAggAccountSymbol() {
+        return aggAccountSymbol;
+    }
+
+    public Path getAggAccount() {
+        return aggAccount;
+    }
+
+    public Path getBucket() {
+        return bucket;
+    }
+
+    public Path getQuoteAge() {
+        return quoteAge;
+    }
+
+    public Path getBaseline() {
+        return baseline;
+    }
+
+    public Path getCluster() {
+        return cluster;
+    }
+
+    public Path getReport() {
+        return report;
+    }
+
+    public Path getChart() {
+        return chart;
+    }
+
+    public Path getBotIndicators() {
+        return botIndicators;
     }
 }
