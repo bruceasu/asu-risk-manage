@@ -1,0 +1,1 @@
+"""Fraud data generator package."""

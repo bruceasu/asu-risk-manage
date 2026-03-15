@@ -10,14 +10,15 @@ Write-Host "Java Version:" -ForegroundColor Green
 & "$env:JAVA_HOME\bin\java.exe" -version
 
 Write-Host "`nMaven Version:" -ForegroundColor Green
-.\mvnw.cmd --version
+& "$env:MAVEN_HOME\bin\mvn.cmd" --version
 
+# Optionally, you can specify a custom settings.xml if needed
+# mvn -s d:\03_projects\suk\asu-trading-analysis\.mvn-local-settings.xml
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host "Environment Ready!" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "You can now run Maven commands, for example:" -ForegroundColor Yellow
-Write-Host "  .\mvnw.cmd clean compile" -ForegroundColor White
-Write-Host "  .\mvnw.cmd clean package -DskipTests" -ForegroundColor White
+Write-Host "  mvn.cmd clean compile" -ForegroundColor White
+Write-Host "  mvn.cmd clean package -DskipTests" -ForegroundColor White
 Write-Host "`nTo build and run:" -ForegroundColor Yellow
-Write-Host "  .\mvnw.cmd -q package -DskipTests" -ForegroundColor White
-Write-Host "  java -jar target\sql2pojo-1.0.0-SNAPSHOT.jar generate --help" -ForegroundColor White
+Write-Host "  mvn.cmd -q package -DskipTests" -ForegroundColor White

@@ -1,0 +1,46 @@
+FX Execution Risk Analysis Report
+==================================
+
+Global Baseline:
+- Avg markout 500ms: -0.0012437499999953527
+- Std markout 500ms: 0.005996219512118814
+- Avg quote_age: 0.0 ms
+- Std quote_age: 0.0 ms
+
+Top Abnormal Accounts:
+--------------------------------
+1. Account A003
+   Trades: 1
+   Z(500ms): 0.2158
+   Z(1s): 0.2158
+   Z(QuoteAge): 0.0000
+   Risk: NORMAL
+
+2. Account A002
+   Trades: 2
+   Z(500ms): 0.2074
+   Z(1s): 0.2074
+   Z(QuoteAge): 0.0000
+   Risk: NORMAL
+
+3. Account A001
+   Trades: 2
+   Z(500ms): 0.2074
+   Z(1s): 0.2074
+   Z(QuoteAge): 0.0000
+   Risk: NORMAL
+
+4. Account A005
+   Trades: 1
+   Z(500ms): 0.1991
+   Z(1s): 0.1991
+   Z(QuoteAge): 0.0000
+   Risk: NORMAL
+
+5. Account A004
+   Trades: 2
+   Z(500ms): -0.6223
+   Z(1s): -0.6223
+   Z(QuoteAge): 0.0000
+   Risk: NORMAL
+

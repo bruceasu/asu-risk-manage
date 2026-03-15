@@ -1,0 +1,9 @@
+account_id,symbol,side,exec_time_ms,size,eventText,orderSize,takeProfit,stopLoss
+A001,EURUSD,BUY,1700000000500,100000,"{""requestPrice"":1.0850,""clientIP"":""192.168.1.100"",""loginName"":""trader01"",""clientType"":""MT4""}",100000,1.0860,1.0840
+A001,EURUSD,SELL,1700000001200,80000,"{""requestPrice"":1.0852,""clientIP"":""192.168.1.100"",""loginName"":""trader01"",""clientType"":""MT4""}",80000,1.0842,1.0862
+A002,USDJPY,BUY,1700000000900,50000,"{""requestPrice"":149.50,""clientIP"":""192.168.1.101"",""loginName"":""trader02"",""clientType"":""cTrader""}",50000,149.70,149.30
+A003,EURUSD,BUY,1700000001500,120000,"{""requestPrice"":1.0851,""clientIP"":""192.168.1.102"",""loginName"":""trader03"",""clientType"":""WebTrader""}",120000,,
+A002,USDJPY,SELL,1700000002300,60000,"{""requestPrice"":149.52,""clientIP"":""192.168.1.101"",""loginName"":""trader02"",""clientType"":""cTrader""}",60000,149.32,149.72
+A004,EURUSD,BUY,1700000002600,70000,"{""requestPrice"":1.0849,""clientIP"":""192.168.1.103"",""loginName"":""trader04"",""clientType"":""MT5""}",70000,1.0859,1.0839
+A004,USDJPY,SELL,1700000003000,70000,"{""requestPrice"":149.48,""clientIP"":""192.168.1.103"",""loginName"":""trader04"",""clientType"":""MT5""}",70000,149.28,149.68
+A005,EURUSD,SELL,1700000003600,90000,"{""requestPrice"":1.0853,""clientIP"":""192.168.1.104"",""loginName"":""trader05"",""clientType"":""WebTrader""}",90000,,

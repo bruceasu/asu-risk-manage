@@ -1,0 +1,6 @@
+account_id,cv,isBotLike,botScore,entropy,tpslRatio,clientIPs,clientTypes,loginNames,totalOrders
+A004,0.0000,1,100,0.0000,1.0000,0,,0,2
+A005,,0,0,0.0000,1.0000,0,,0,1
+A003,,0,0,0.0000,1.0000,0,,0,1
+A001,0.0000,0,0,1.0000,1.0000,0,,0,2
+A002,0.0000,0,0,1.0000,1.0000,0,,0,2

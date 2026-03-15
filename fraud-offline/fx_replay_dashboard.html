@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FX Replay Dashboard</title>
+  <style>
+    :root { --bg:#f6f8fb; --fg:#1f2937; --card:#ffffff; --line:#e5e7eb; --green:#16a34a; --red:#dc2626; --blue:#2563eb; }
+    body { margin:0; padding:20px; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background:var(--bg); color:var(--fg); }
+    h1,h2 { margin:0 0 12px 0; }
+    .meta { color:#4b5563; margin-bottom:16px; }
+    .grid { display:grid; grid-template-columns:1fr; gap:16px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th,td { border-bottom:1px solid var(--line); padding:6px 8px; text-align:right; }
+    th:first-child, td:first-child { text-align:left; }
+    .bar-wrap { background:#eef2ff; height:12px; border-radius:6px; position:relative; }
+    .bar { height:12px; border-radius:6px; }
+    .row-flex { display:grid; grid-template-columns:180px 1fr 90px; gap:8px; align-items:center; margin:6px 0; font-size:13px; }
+    svg { width:100%; height:360px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+    .muted { color:#6b7280; font-size:12px; }
+  </style>
+</head>
+<body>
+<h1>FX Replay Dashboard</h1>
+<div class='meta'>trades=examples\trades.csv | quotes=examples\quotes.csv | accounts=5 | min_trades=1</div>
+<div class='grid'>
+<div class='card'><h2>Top Accounts by avg_markout_500ms</h2>
+<div class='row-flex'><div>A003 (n=1)</div><div class='bar-wrap'><div class='bar' style='width:1.01%;background:var(--green)'></div></div><div>0.00005000</div></div>
+<div class='row-flex'><div>A002 (n=2)</div><div class='bar-wrap'><div class='bar' style='width:0.00%;background:var(--green)'></div></div><div>0.00000000</div></div>
+<div class='row-flex'><div>A001 (n=2)</div><div class='bar-wrap'><div class='bar' style='width:0.00%;background:var(--green)'></div></div><div>0.00000000</div></div>
+<div class='row-flex'><div>A005 (n=1)</div><div class='bar-wrap'><div class='bar' style='width:1.01%;background:var(--red)'></div></div><div>-0.00005000</div></div>
+<div class='row-flex'><div>A004 (n=2)</div><div class='bar-wrap'><div class='bar' style='width:100.00%;background:var(--red)'></div></div><div>-0.00497500</div></div>
+<div class='muted'>绿色为正，红色为负；条长按绝对值归一化。</div></div>
+<div class='card'><h2>Scatter: avg_quote_age_ms vs avg_markout_500ms</h2>
+<svg viewBox='0 0 1000 360'><line x1='50' y1='23.034825870642475' x2='980' y2='23.034825870642475' stroke='#9ca3af' stroke-width='1'/><line x1='50' y1='20' x2='50' y2='325' stroke='#9ca3af' stroke-width='1'/><circle cx='50.00' cy='20.00' r='3' fill='#16a34a'><title>A003 | n=1 | avg500=0.00005000 | avgQA=0.00</title></circle><circle cx='50.00' cy='23.03' r='3' fill='#16a34a'><title>A002 | n=2 | avg500=0.00000000 | avgQA=0.00</title></circle><circle cx='50.00' cy='23.03' r='3' fill='#16a34a'><title>A001 | n=2 | avg500=0.00000000 | avgQA=0.00</title></circle><circle cx='50.00' cy='26.07' r='3' fill='#dc2626'><title>A005 | n=1 | avg500=-0.00005000 | avgQA=0.00</title></circle><circle cx='50.00' cy='325.00' r='3' fill='#dc2626'><title>A004 | n=2 | avg500=-0.00497500 | avgQA=0.00</title></circle></svg><div class='muted'>X 轴=avg_quote_age_ms，Y 轴=avg_markout_500ms（上正下负）。</div></div>
+<div class='card'><h2>Top Accounts Table</h2>
+<table><thead><tr><th>account</th><th>n</th><th>avg500</th><th>avg1s</th><th>pos500</th><th>pos1s</th><th>avg_quote_age_ms</th></tr></thead><tbody><tr><td>A003</td><td>1</td><td>0.00005000</td><td>0.00010000</td><td>1.0000</td><td>1.0000</td><td>0.00</td></tr><tr><td>A002</td><td>2</td><td>0.00000000</td><td>0.00000000</td><td>0.5000</td><td>0.5000</td><td>0.00</td></tr><tr><td>A001</td><td>2</td><td>0.00000000</td><td>0.00000000</td><td>0.5000</td><td>0.5000</td><td>0.00</td></tr><tr><td>A005</td><td>1</td><td>-0.00005000</td><td>-0.00010000</td><td>0.0000</td><td>0.0000</td><td>0.00</td></tr><tr><td>A004</td><td>2</td><td>-0.00497500</td><td>-0.00995000</td><td>0.5000</td><td>0.5000</td><td>0.00</td></tr></tbody></table></div>
+</div>
+</body></html>

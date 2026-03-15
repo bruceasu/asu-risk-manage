@@ -1,0 +1,142 @@
+﻿insert into rule_definition (
+    rule_code,
+    rule_name,
+    category,
+    description,
+    severity,
+    owner_module,
+    current_version,
+    is_active,
+    created_at,
+    updated_at
+) values
+    (
+        'HIGH_RISK_IP_LOGIN',
+        'High Risk IP Login Rule',
+        'LOGIN',
+        'Triggers when high risk IP login count within 24 hours reaches the configured threshold.',
+        'HIGH',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'LOGIN_FAILURE_BURST',
+        'Login Failure Burst Rule',
+        'LOGIN',
+        'Triggers when login failures and failure rate within 24 hours exceed configured thresholds.',
+        'HIGH',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'RAPID_WITHDRAW_AFTER_DEPOSIT',
+        'Rapid Withdraw After Deposit Rule',
+        'TRANSACTION',
+        'Triggers when fast withdrawal behavior appears shortly after deposits.',
+        'HIGH',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'REWARD_WITHDRAW_ABUSE',
+        'Reward Withdraw Abuse Rule',
+        'TRANSACTION',
+        'Triggers when reward-linked transactions are followed by suspiciously fast withdrawals.',
+        'MEDIUM',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'SHARED_DEVICE_CLUSTER',
+        'Shared Device Cluster Rule',
+        'DEVICE',
+        'Triggers when one device is linked to too many accounts within the recent observation window.',
+        'MEDIUM',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'DEVICE_SWITCH_SPIKE',
+        'Device Switch Spike Rule',
+        'DEVICE',
+        'Triggers when device switching and unique device counts spike together.',
+        'MEDIUM',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'RAPID_PROFILE_CHANGE',
+        'Rapid Profile Change Rule',
+        'SECURITY',
+        'Triggers when rapid profile or security-sensitive changes are detected before evaluation.',
+        'MEDIUM',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'SECURITY_CHANGE_BEFORE_WITHDRAW',
+        'Security Change Before Withdraw Rule',
+        'SECURITY',
+        'Triggers when withdrawal happens soon after security-sensitive account changes.',
+        'HIGH',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'HIGH_RISK_NEIGHBOR_CLUSTER',
+        'High Risk Neighbor Cluster Rule',
+        'GRAPH',
+        'Triggers when graph neighborhood and cluster size indicate risky linked-account structures.',
+        'HIGH',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    ),
+    (
+        'ATO_SUSPICION_COMPOSITE',
+        'ATO Suspicion Composite Rule',
+        'COMPOSITE',
+        'Triggers when multiple account-takeover indicators appear together.',
+        'CRITICAL',
+        'fraud-rule-engine',
+        1,
+        true,
+        current_timestamp,
+        current_timestamp
+    )
+on conflict (rule_code) do update
+set rule_name = excluded.rule_name,
+    category = excluded.category,
+    description = excluded.description,
+    severity = excluded.severity,
+    owner_module = excluded.owner_module,
+    current_version = excluded.current_version,
+    is_active = excluded.is_active,
+    updated_at = current_timestamp;
+

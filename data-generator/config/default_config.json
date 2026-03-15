@@ -1,0 +1,80 @@
+{
+  "seed": 42,
+  "start_time": "2025-01-01T00:00:00",
+  "end_time": "2025-03-31T23:59:59",
+  "profiles": {
+    "small": {
+      "account_count": 1000,
+      "device_count": 1400,
+      "ip_count": 900,
+      "merchant_count": 120,
+      "beneficiary_count": 850,
+      "total_events": 100000,
+      "chunk_size": 5000
+    },
+    "medium": {
+      "account_count": 10000,
+      "device_count": 12000,
+      "ip_count": 7000,
+      "merchant_count": 600,
+      "beneficiary_count": 9000,
+      "total_events": 1000000,
+      "chunk_size": 10000
+    },
+    "large": {
+      "account_count": 100000,
+      "device_count": 120000,
+      "ip_count": 50000,
+      "merchant_count": 4000,
+      "beneficiary_count": 80000,
+      "total_events": 10000000,
+      "chunk_size": 20000
+    }
+  },
+  "event_type_weights": {
+    "login_events": 0.18,
+    "session_events": 0.14,
+    "page_views": 0.16,
+    "payment_attempts": 0.14,
+    "card_transactions": 0.14,
+    "bank_transfers": 0.08,
+    "cash_out_events": 0.05,
+    "p2p_transfers": 0.06,
+    "chargebacks": 0.02,
+    "alerts": 0.015,
+    "cases": 0.005,
+    "scenario_events": 0.025
+  },
+  "account_status_weights": {
+    "active": 0.88,
+    "review": 0.07,
+    "suspended": 0.03,
+    "closed": 0.02
+  },
+  "country_weights": {
+    "US": 0.42,
+    "GB": 0.12,
+    "DE": 0.09,
+    "JP": 0.08,
+    "SG": 0.08,
+    "CA": 0.08,
+    "AU": 0.07,
+    "NL": 0.06
+  },
+  "currency_by_country": {
+    "US": "USD",
+    "GB": "GBP",
+    "DE": "EUR",
+    "JP": "JPY",
+    "SG": "SGD",
+    "CA": "CAD",
+    "AU": "AUD",
+    "NL": "EUR"
+  },
+  "risk_band_weights": {
+    "low": 0.72,
+    "medium": 0.2,
+    "high": 0.08
+  },
+  "fraud_ratio": 0.025
+}

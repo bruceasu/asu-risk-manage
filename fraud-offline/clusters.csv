@@ -1,0 +1,6 @@
+cluster_id,account_id,vector_norm,note
+1,A005,1.0000,threshold=0.93
+1,A003,1.0000,threshold=0.93
+1,A004,1.0000,threshold=0.93
+1,A001,1.0000,threshold=0.93
+1,A002,1.0000,threshold=0.93

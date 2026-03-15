@@ -9,9 +9,15 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>asu-trading-analysis-core</module>
-        <module>asu-trading-analysis-offline</module>
-        <module>asu-trading-analysis-online</module>
+        <module>fraud-core</module>
+        <module>fraud-offline</module>
+        <module>fraud-online</module>
+        <module>fraud-feature</module>
+        <module>fraud-rule-engine</module>
+        <module>fraud-risk</module>
+        <module>fraud-case</module>
+        <module>fraud-graph</module>
+        <module>fraud-ai</module>
     </modules>
     <properties>
         <!-- 编译参数 -->

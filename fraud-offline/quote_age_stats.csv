@@ -1,0 +1,7 @@
+scope_key,count_samples,p50_ms,p90_ms,p99_ms,mean_ms
+account=A001;symbol=EURUSD,2,0,0,0,0.00
+account=A002;symbol=USDJPY,2,0,0,0,0.00
+account=A003;symbol=EURUSD,1,0,0,0,0.00
+account=A004;symbol=EURUSD,1,0,0,0,0.00
+account=A004;symbol=USDJPY,1,0,0,0,0.00
+account=A005;symbol=EURUSD,1,0,0,0,0.00

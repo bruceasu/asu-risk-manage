@@ -1,0 +1,2 @@
+scope,n,avg_markout_100ms,pos_ratio_100ms,avg_markout_500ms,pos_ratio_500ms,avg_markout_1s,pos_ratio_1s,avg_markout_5s,pos_ratio_5s,avg_quote_age_ms,trades_per_min,symbol_count
+GLOBAL,8,-0.0002487500,0.5000,-0.0012437500,0.5000,-0.0024875000,0.5000,-0.0041787500,0.5000,0.00,154.8387,2
