@@ -9,10 +9,16 @@ Tech stack:
 ---
 # Architecture
 Main modules:
-asu-trading-analysis-core
-asu-trading-analysis-offline
-asu-trading-analysis-online
-
+fraud-core
+fraud-offline
+fraud-online
+fraud-batch
+fraud-feature
+fraud-rule-engine
+fraud-risk
+fraud-case
+fraud-graph
+fraud-ai
 ---
 # Coding Conventions
 Language: Java
