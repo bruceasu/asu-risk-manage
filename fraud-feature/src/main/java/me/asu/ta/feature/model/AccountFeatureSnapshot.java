@@ -81,8 +81,6 @@ public final class AccountFeatureSnapshot {
     private final Integer graphClusterSize30d;
     /** account_feature_snapshot.risk_neighbor_count_30d */
     private final Integer riskNeighborCount30d;
-    /** account_feature_snapshot.anomaly_score_last */
-    private final Double anomalyScoreLast;
 
     private AccountFeatureSnapshot(Builder builder) {
         this.accountId = Objects.requireNonNull(builder.accountId, "accountId");
@@ -122,7 +120,6 @@ public final class AccountFeatureSnapshot {
         this.sharedBankAccounts30d = builder.sharedBankAccounts30d;
         this.graphClusterSize30d = builder.graphClusterSize30d;
         this.riskNeighborCount30d = builder.riskNeighborCount30d;
-        this.anomalyScoreLast = builder.anomalyScoreLast;
     }
 
     public String accountId() { return accountId; }
@@ -162,7 +159,6 @@ public final class AccountFeatureSnapshot {
     public Integer sharedBankAccounts30d() { return sharedBankAccounts30d; }
     public Integer graphClusterSize30d() { return graphClusterSize30d; }
     public Integer riskNeighborCount30d() { return riskNeighborCount30d; }
-    public Double anomalyScoreLast() { return anomalyScoreLast; }
 
     public static Builder builder(String accountId, Instant generatedAt) {
         return new Builder(accountId, generatedAt);
@@ -206,7 +202,6 @@ public final class AccountFeatureSnapshot {
         private Integer sharedBankAccounts30d;
         private Integer graphClusterSize30d;
         private Integer riskNeighborCount30d;
-        private Double anomalyScoreLast;
 
         private Builder(String accountId, Instant generatedAt) {
             this.accountId = accountId;
@@ -248,7 +243,6 @@ public final class AccountFeatureSnapshot {
         public Builder sharedBankAccounts30d(Integer value) { this.sharedBankAccounts30d = value; return this; }
         public Builder graphClusterSize30d(Integer value) { this.graphClusterSize30d = value; return this; }
         public Builder riskNeighborCount30d(Integer value) { this.riskNeighborCount30d = value; return this; }
-        public Builder anomalyScoreLast(Double value) { this.anomalyScoreLast = value; return this; }
         public AccountFeatureSnapshot build() { return new AccountFeatureSnapshot(this); }
     }
 }

@@ -3,7 +3,6 @@ package me.asu.ta.rule.engine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import me.asu.ta.rule.api.FraudRule;
 import me.asu.ta.rule.model.RuleConfig;
 import me.asu.ta.rule.model.RuleEngineResult;
 import me.asu.ta.rule.model.RuleEvaluationContext;

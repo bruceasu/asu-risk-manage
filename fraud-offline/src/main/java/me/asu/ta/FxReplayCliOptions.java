@@ -27,6 +27,12 @@ public final class FxReplayCliOptions {
     private final boolean charts;
     private final int chartTopN;
     private final boolean integrateCurrentSystem;
+    private final boolean behaviorCluster;
+    private final int behaviorClusterK;
+    private final double behaviorClusterThreshold;
+    private final boolean similarityEdges;
+    private final double similarityThreshold;
+    private final int topSimilarPerAccount;
 
     private FxReplayCliOptions(
             Path tradesPath,
@@ -43,7 +49,13 @@ public final class FxReplayCliOptions {
             int minTrades,
             boolean charts,
             int chartTopN,
-            boolean integrateCurrentSystem) {
+            boolean integrateCurrentSystem,
+            boolean behaviorCluster,
+            int behaviorClusterK,
+            double behaviorClusterThreshold,
+            boolean similarityEdges,
+            double similarityThreshold,
+            int topSimilarPerAccount) {
         this.tradesPath = tradesPath;
         this.quotesPath = quotesPath;
         this.replay = replay;
@@ -59,6 +71,12 @@ public final class FxReplayCliOptions {
         this.charts = charts;
         this.chartTopN = chartTopN;
         this.integrateCurrentSystem = integrateCurrentSystem;
+        this.behaviorCluster = behaviorCluster;
+        this.behaviorClusterK = behaviorClusterK;
+        this.behaviorClusterThreshold = behaviorClusterThreshold;
+        this.similarityEdges = similarityEdges;
+        this.similarityThreshold = similarityThreshold;
+        this.topSimilarPerAccount = topSimilarPerAccount;
     }
 
     public static FxReplayCliOptions fromArgs(String[] args) {
@@ -69,7 +87,9 @@ public final class FxReplayCliOptions {
                 "--baseline",
                 "--report",
                 "--charts",
-                "--integrate-current-system"
+                "--integrate-current-system",
+                "--behavior-cluster",
+                "--similarity-edges"
         ));
         return fromCli(parseArgs(args));
     }
@@ -95,7 +115,11 @@ public final class FxReplayCliOptions {
                         resolveOutput(cli, "--out-cluster", "clusters.csv"),
                         resolveOutput(cli, "--out-report", "risk_report.txt"),
                         resolveOutput(cli, "--out-chart", "fx_replay_dashboard.html"),
-                        resolveOutput(cli, "--out-bot-indicators", "bot_indicators.csv")
+                        resolveOutput(cli, "--out-bot-indicators", "bot_indicators.csv"),
+                        resolveOutput(cli, "--out-behavior-features", "account_behavior_features.csv"),
+                        resolveOutput(cli, "--out-behavior-clusters", "account_behavior_clusters.csv"),
+                        resolveOutput(cli, "--out-similarity-edges", "account_similarity_edges.csv"),
+                        resolveOutput(cli, "--out-behavior-report", "behavior_cluster_report.txt")
                 ),
                 hasFlag(cli, "--agg-account"),
                 hasFlag(cli, "--cluster"),
@@ -107,7 +131,13 @@ public final class FxReplayCliOptions {
                 intv(cli, "--min-trades", 0),
                 hasFlag(cli, "--charts"),
                 intv(cli, "--chart-top-n", 20),
-                hasFlag(cli, "--integrate-current-system")
+                hasFlag(cli, "--integrate-current-system"),
+                hasFlag(cli, "--behavior-cluster"),
+                parseInt(cli.getOrDefault("--behavior-cluster-k", "0")),
+                parseDouble(cli.getOrDefault("--behavior-cluster-threshold", "0.90")),
+                hasFlag(cli, "--similarity-edges"),
+                parseDouble(cli.getOrDefault("--similarity-threshold", "0.93")),
+                intv(cli, "--top-similar-per-account", 5)
         );
     }
 
@@ -198,5 +228,29 @@ public final class FxReplayCliOptions {
 
     public boolean isIntegrateCurrentSystem() {
         return integrateCurrentSystem;
+    }
+
+    public boolean isBehaviorCluster() {
+        return behaviorCluster;
+    }
+
+    public int getBehaviorClusterK() {
+        return behaviorClusterK;
+    }
+
+    public double getBehaviorClusterThreshold() {
+        return behaviorClusterThreshold;
+    }
+
+    public boolean isSimilarityEdges() {
+        return similarityEdges;
+    }
+
+    public double getSimilarityThreshold() {
+        return similarityThreshold;
+    }
+
+    public int getTopSimilarPerAccount() {
+        return topSimilarPerAccount;
     }
 }

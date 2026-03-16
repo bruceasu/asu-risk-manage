@@ -117,15 +117,12 @@ public class GraphFeatureCalculator implements FeatureCalculator {
     private void applyRiskNeighborMetrics(List<String> accountIds, Instant generatedAt, Map<String, AccountFeatureSnapshot.Builder> builders) {
         String sql = """
                 select age.from_account as account_id,
-                       count(distinct fl.account_id)::int as risk_neighbor_count_30d,
-                       avg(ic.risk_score)::double precision as anomaly_score_last
+                       count(distinct fl.account_id)::int as risk_neighbor_count_30d
                   from account_graph_edges age
                   left join fraud_labels fl
                     on fl.account_id = age.to_account
                    and fl.labeled_at > :windowStart
                    and fl.labeled_at <= :generatedAt
-                  left join investigation_cases ic
-                    on ic.account_id = age.from_account
                  where age.from_account in (:accountIds)
                    and age.created_at > :windowStart
                    and age.created_at <= :generatedAt
@@ -140,7 +137,6 @@ public class GraphFeatureCalculator implements FeatureCalculator {
                         return;
                     }
                     builder.riskNeighborCount30d(FeatureCalculatorSupport.getInteger(rs, "risk_neighbor_count_30d"));
-                    builder.anomalyScoreLast(FeatureCalculatorSupport.getDouble(rs, "anomaly_score_last"));
                 }));
     }
 

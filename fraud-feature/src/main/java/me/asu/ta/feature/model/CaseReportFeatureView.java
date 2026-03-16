@@ -8,7 +8,6 @@ public record CaseReportFeatureView(
         boolean rapidWithdrawAfterDepositFlag24h,
         int sharedDeviceAccounts7d,
         int graphClusterSize30d,
-        int riskNeighborCount30d,
-        double anomalyScoreLast
+        int riskNeighborCount30d
 ) {
 }

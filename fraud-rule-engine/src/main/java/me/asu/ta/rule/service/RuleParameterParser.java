@@ -11,6 +11,7 @@ import me.asu.ta.rule.model.params.CompositeRuleParams;
 import me.asu.ta.rule.model.params.DeviceRuleParams;
 import me.asu.ta.rule.model.params.GraphRuleParams;
 import me.asu.ta.rule.model.params.LoginRuleParams;
+import me.asu.ta.rule.model.params.OfflineBehaviorRuleParams;
 import me.asu.ta.rule.model.params.RuleParameters;
 import me.asu.ta.rule.model.params.SecurityRuleParams;
 import me.asu.ta.rule.model.params.TransactionRuleParams;
@@ -45,6 +46,9 @@ public class RuleParameterParser {
     }
 
     private RuleParameters parseTypedParameters(String ruleCode, RuleCategory category, JsonNode root) {
+        if (supportsOfflineBehaviorParams(ruleCode)) {
+            return convert(ruleCode, root, OfflineBehaviorRuleParams.class);
+        }
         return switch (category) {
             case LOGIN -> convert(ruleCode, root, LoginRuleParams.class);
             case TRANSACTION -> convert(ruleCode, root, TransactionRuleParams.class);
@@ -53,6 +57,11 @@ public class RuleParameterParser {
             case GRAPH -> convert(ruleCode, root, GraphRuleParams.class);
             case COMPOSITE -> convert(ruleCode, root, CompositeRuleParams.class);
         };
+    }
+
+    private boolean supportsOfflineBehaviorParams(String ruleCode) {
+        return "OFFLINE_COORDINATED_TRADING".equals(ruleCode)
+                || "BATCH_OFFLINE_BEHAVIOR_TEST".equals(ruleCode);
     }
 
     private <T extends RuleParameters> T convert(String ruleCode, JsonNode root, Class<T> type) {

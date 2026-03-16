@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.sql.DataSource;
+import me.asu.ta.OfflineBehaviorContextKeys;
 import me.asu.ta.casemanagement.builder.FeatureSummaryBuilder;
 import me.asu.ta.casemanagement.builder.GraphSummaryBuilder;
 import me.asu.ta.casemanagement.builder.InvestigationCaseBuilder;
@@ -35,6 +36,7 @@ import me.asu.ta.casemanagement.service.CaseRetrievalService;
 import me.asu.ta.casemanagement.timeline.CaseTimelineBuilder;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import me.asu.ta.risk.model.GraphRiskSignal;
+import me.asu.ta.risk.model.MlAnomalySignal;
 import me.asu.ta.risk.model.RiskLevel;
 import me.asu.ta.risk.model.RiskScoreResult;
 import me.asu.ta.risk.model.ScoreBreakdown;
@@ -84,6 +86,14 @@ public final class CaseTestSupport {
 
     public static CaseRecommendationBuilder recommendationBuilder() {
         return new CaseRecommendationBuilder();
+    }
+
+    public static Map<String, Object> sampleBehaviorContextSignals() {
+        return Map.of(
+                OfflineBehaviorContextKeys.BEHAVIOR_CLUSTER_SIZE, 6,
+                OfflineBehaviorContextKeys.SIMILAR_ACCOUNT_COUNT, 4,
+                OfflineBehaviorContextKeys.BEHAVIOR_MAX_SIMILARITY, 0.97d,
+                OfflineBehaviorContextKeys.COORDINATED_TRADING_SCORE, 78.0d);
     }
 
     public static InvestigationCaseRepository investigationCaseRepository(DataSource dataSource) {
@@ -165,8 +175,7 @@ public final class CaseTestSupport {
                 .sharedIpAccounts7d(4)
                 .sharedBankAccounts30d(3)
                 .graphClusterSize30d(7)
-                .riskNeighborCount30d(5)
-                .anomalyScoreLast(0.93d);
+                .riskNeighborCount30d(5);
     }
 
     public static RuleEngineResult sampleRuleEngineResult(String accountId) {
@@ -239,7 +248,11 @@ public final class CaseTestSupport {
         InvestigationCase savedCase = caseRepository.save(builder.buildCaseHeader(snapshot, riskScoreResult));
         long caseId = savedCase.caseId();
         CaseRiskSummary riskSummary = builder.buildRiskSummary(caseId, riskScoreResult);
-        CaseFeatureSummary featureSummary = builder.buildFeatureSummary(caseId, snapshot, FIXED_TIME);
+        CaseFeatureSummary featureSummary = builder.buildFeatureSummary(
+                caseId,
+                snapshot,
+                new MlAnomalySignal(0.93d, 93.0d, "case-test", FIXED_TIME),
+                FIXED_TIME);
         List<CaseRuleHit> ruleHits = builder.buildRuleHits(caseId, ruleEngineResult, FIXED_TIME);
         CaseGraphSummary graphSummary = builder.buildGraphSummary(
                 caseId,
@@ -252,8 +265,18 @@ public final class CaseTestSupport {
                         EvaluationMode.REALTIME,
                         FIXED_TIME),
                 FIXED_TIME);
-        List<CaseTimelineEvent> timeline = timelineBuilder().build(caseId, snapshot, ruleEngineResult, riskScoreResult);
-        List<CaseRecommendedAction> actions = recommendationBuilder().build(caseId, snapshot, ruleEngineResult, riskScoreResult);
+        List<CaseTimelineEvent> timeline = timelineBuilder().build(
+                caseId,
+                snapshot,
+                ruleEngineResult,
+                riskScoreResult,
+                sampleBehaviorContextSignals());
+        List<CaseRecommendedAction> actions = recommendationBuilder().build(
+                caseId,
+                snapshot,
+                ruleEngineResult,
+                riskScoreResult,
+                sampleBehaviorContextSignals());
 
         riskRepository.save(riskSummary);
         featureRepository.save(featureSummary);

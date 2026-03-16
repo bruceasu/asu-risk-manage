@@ -9,6 +9,7 @@ import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import me.asu.ta.feature.service.FeatureStoreService;
 import me.asu.ta.offline.integration.OfflineAnalysisBundle;
 import me.asu.ta.offline.integration.OfflineBatchIntegrationResult;
+import me.asu.ta.offline.integration.OfflineBehaviorRiskBridgeService;
 import me.asu.ta.offline.integration.OfflineGraphBridgeService;
 import me.asu.ta.offline.integration.OfflineRiskBatchService;
 import me.asu.ta.offline.integration.OfflineSnapshotMappingService;
@@ -29,7 +30,7 @@ public class OfflineRiskBatchServiceTest {
         List<AccountFeatureSnapshot> historySnapshots = new ArrayList<>();
         List<RiskEvaluationRequest> evaluatedRequests = new ArrayList<>();
 
-        FeatureStoreService featureStoreService = new FeatureStoreService(null, null, List.of()) {
+        FeatureStoreService featureStoreService = new FeatureStoreService(null, null, null) {
             @Override
             public int persistSnapshot(AccountFeatureSnapshot snapshot) {
                 persistedSnapshots.add(snapshot);
@@ -66,8 +67,27 @@ public class OfflineRiskBatchServiceTest {
 
         ReplayState state = new ReplayState();
         Agg agg = new Agg();
-        agg.n = 10;
+        agg.add("EURUSD", 1_000L, 0.0010, 0.0020, 0.0030, 0.0040, 100L);
+        agg.add("EURUSD", 2_000L, 0.0010, 0.0021, 0.0031, 0.0041, 120L);
+        agg.add("EURUSD", 3_000L, 0.0010, 0.0022, 0.0032, 0.0042, 140L);
         state.getAggByAccount().put("A1", agg);
+        OfflineAccountTracker tracker = new OfflineAccountTracker();
+        tracker.addOrderTime(1_000L);
+        tracker.addOrderTime(2_000L);
+        tracker.addOrderTime(3_000L);
+        state.getAccountTrackers().put("A1", tracker);
+        DetailRow row1 = new DetailRow("A1", "EURUSD", "BUY", 1_000L, 1.0, 1.1000, 900L, 100L);
+        row1.marks[1] = 0.0020;
+        row1.marks[2] = 0.0030;
+        DetailRow row2 = new DetailRow("A1", "EURUSD", "SELL", 2_000L, 1.0, 1.1002, 1_880L, 120L);
+        row2.marks[1] = 0.0021;
+        row2.marks[2] = 0.0031;
+        DetailRow row3 = new DetailRow("A1", "EURUSD", "BUY", 3_000L, 1.0, 1.1004, 2_860L, 140L);
+        row3.marks[1] = 0.0022;
+        row3.marks[2] = 0.0032;
+        state.getDetailRows().add(row1);
+        state.getDetailRows().add(row2);
+        state.getDetailRows().add(row3);
         OfflineAnalysisBundle bundle = new OfflineAnalysisBundle(
                 state,
                 null,
@@ -78,7 +98,11 @@ public class OfflineRiskBatchServiceTest {
                 featureStoreService,
                 riskEngineFacade,
                 new OfflineSnapshotMappingService(),
-                new OfflineGraphBridgeService());
+                new OfflineGraphBridgeService(),
+                new OfflineBehaviorRiskBridgeService(
+                        new me.asu.ta.offline.analysis.BehaviorFeatureAnalysisService(),
+                        new me.asu.ta.offline.analysis.BehaviorClusterAnalysisService(),
+                        new me.asu.ta.offline.analysis.AccountSimilarityAnalysisService()));
 
         OfflineBatchIntegrationResult result = service.integrate(bundle);
 
@@ -91,5 +115,7 @@ public class OfflineRiskBatchServiceTest {
         Assert.assertNotNull(signal);
         Assert.assertEquals(5, signal.graphClusterSize());
         Assert.assertEquals("A1", persistedSnapshots.getFirst().accountId());
+        Assert.assertEquals("fraud-offline", evaluatedRequests.getFirst().contextSignals().get("source"));
+        Assert.assertEquals(1, evaluatedRequests.getFirst().contextSignals().get("behaviorClusterSize"));
     }
 }

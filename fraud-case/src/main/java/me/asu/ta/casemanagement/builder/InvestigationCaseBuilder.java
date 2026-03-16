@@ -10,6 +10,7 @@ import me.asu.ta.casemanagement.model.CaseRuleHit;
 import me.asu.ta.casemanagement.model.CaseStatus;
 import me.asu.ta.casemanagement.model.InvestigationCase;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
+import me.asu.ta.risk.model.MlAnomalySignal;
 import me.asu.ta.risk.model.RiskScoreResult;
 import me.asu.ta.rule.model.RuleEngineResult;
 import org.springframework.stereotype.Component;
@@ -52,8 +53,12 @@ public class InvestigationCaseBuilder {
         return riskSummaryBuilder.build(caseId, riskScoreResult);
     }
 
-    public CaseFeatureSummary buildFeatureSummary(long caseId, AccountFeatureSnapshot snapshot, Instant createdAt) {
-        return featureSummaryBuilder.build(caseId, snapshot, createdAt);
+    public CaseFeatureSummary buildFeatureSummary(
+            long caseId,
+            AccountFeatureSnapshot snapshot,
+            MlAnomalySignal mlAnomalySignal,
+            Instant createdAt) {
+        return featureSummaryBuilder.build(caseId, snapshot, mlAnomalySignal, createdAt);
     }
 
     public List<CaseRuleHit> buildRuleHits(long caseId, RuleEngineResult ruleEngineResult, Instant createdAt) {

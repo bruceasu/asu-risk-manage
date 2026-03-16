@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import me.asu.ta.risk.RiskTestSupport;
 import me.asu.ta.risk.model.GraphRiskSignal;
+import me.asu.ta.risk.model.MlAnomalySignal;
 import me.asu.ta.risk.model.RiskEvaluationRequest;
 import me.asu.ta.risk.model.RiskLevel;
 import me.asu.ta.risk.model.RiskScoreResult;
@@ -29,6 +30,9 @@ class RiskEvaluationServiceIntegrationTest {
         RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("RULE_WALLET_DRAIN", RuleSeverity.HIGH, "RULE"));
         RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("BEHAVIOR_HIGH_RISK_IP_ACTIVITY", RuleSeverity.MEDIUM, "BEHAVIOR"));
         RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("BEHAVIOR_SHARED_DEVICE_EXPOSURE", RuleSeverity.MEDIUM, "BEHAVIOR"));
+        RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("BEHAVIOR_OFFLINE_CLUSTER_DENSE", RuleSeverity.MEDIUM, "BEHAVIOR"));
+        RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("BEHAVIOR_OFFLINE_SIMILAR_ACCOUNTS", RuleSeverity.MEDIUM, "BEHAVIOR"));
+        RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("BEHAVIOR_OFFLINE_COORDINATED_TRADING", RuleSeverity.HIGH, "BEHAVIOR"));
 
         RiskEvaluationService service = RiskTestSupport.riskEvaluationService(dataSource);
 
@@ -38,7 +42,6 @@ class RiskEvaluationServiceIntegrationTest {
                 .securityChangeBeforeWithdrawFlag24h(true)
                 .riskNeighborCount30d(4)
                 .graphClusterSize30d(6)
-                .anomalyScoreLast(0.91d)
                 .build();
         AccountFeatureSnapshot secondSnapshot = RiskTestSupport.snapshotBuilder("acct-batch-2")
                 .loginFailureRate24h(0.18d)
@@ -46,11 +49,21 @@ class RiskEvaluationServiceIntegrationTest {
                 .sharedDeviceAccounts7d(1)
                 .graphClusterSize30d(1)
                 .riskNeighborCount30d(0)
-                .anomalyScoreLast(null)
                 .build();
 
         List<RiskEvaluationRequest> requests = List.of(
-                new RiskEvaluationRequest("acct-batch-1", firstSnapshot, null, null, Map.of("channel", "web"), EvaluationMode.BATCH, RiskTestSupport.FIXED_TIME),
+                new RiskEvaluationRequest(
+                        "acct-batch-1",
+                        firstSnapshot,
+                        null,
+                        new MlAnomalySignal(0.91d, 91.0d, "test-anomaly", RiskTestSupport.FIXED_TIME),
+                        Map.of(
+                                "channel", "web",
+                                "behaviorClusterSize", 5,
+                                "similarAccountCount", 4,
+                                "coordinatedTradingScore", 72.0d),
+                        EvaluationMode.BATCH,
+                        RiskTestSupport.FIXED_TIME),
                 new RiskEvaluationRequest("acct-batch-2", secondSnapshot, new GraphRiskSignal(10.0d, 1, 0, 1, 0), null, Map.of("channel", "app"), EvaluationMode.BATCH, RiskTestSupport.FIXED_TIME));
 
         Map<String, RuleEngineResult> ruleResults = Map.of(
@@ -77,6 +90,7 @@ class RiskEvaluationServiceIntegrationTest {
         assertEquals(RiskLevel.CRITICAL, results.get("acct-batch-1").riskLevel());
         assertEquals("DEFAULT", results.get("acct-batch-1").profileName());
         assertEquals("GRAPH_HIGH_RISK_NEIGHBORS", results.get("acct-batch-1").topReasonCodes().getFirst());
+        assertTrue(results.get("acct-batch-1").topReasonCodes().contains("BEHAVIOR_OFFLINE_COORDINATED_TRADING"));
         assertEquals(EvaluationMode.BATCH, results.get("acct-batch-1").evaluationMode());
 
         assertEquals("NO_ML", results.get("acct-batch-2").profileName());

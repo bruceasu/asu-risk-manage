@@ -2,11 +2,8 @@ package me.asu.ta.offline.integration;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import me.asu.ta.Agg;
-import me.asu.ta.Anomaly;
 import me.asu.ta.OfflineAccountTracker;
 import me.asu.ta.ReplayState;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
@@ -17,11 +14,6 @@ public class OfflineSnapshotMappingService {
     private static final int OFFLINE_FEATURE_VERSION = 9001;
 
     public List<AccountFeatureSnapshot> mapSnapshots(OfflineAnalysisBundle bundle, Instant generatedAt) {
-        Map<String, Anomaly> anomalyByAccount = new HashMap<>();
-        for (Anomaly anomaly : bundle.anomalies()) {
-            anomalyByAccount.put(anomaly.account, anomaly);
-        }
-
         List<AccountFeatureSnapshot> snapshots = new ArrayList<>();
         ReplayState replayState = bundle.replayState();
         for (var entry : replayState.getAggByAccount().entrySet()) {
@@ -29,7 +21,7 @@ public class OfflineSnapshotMappingService {
             Agg agg = entry.getValue();
             OfflineAccountTracker tracker = replayState.getAccountTrackers().get(accountId);
             int clusterSize = bundle.clusterSizes().getOrDefault(accountId, 1);
-            snapshots.add(mapAccount(accountId, agg, tracker, anomalyByAccount.get(accountId), clusterSize, generatedAt));
+            snapshots.add(mapAccount(accountId, agg, tracker, clusterSize, generatedAt));
         }
         return snapshots;
     }
@@ -38,7 +30,6 @@ public class OfflineSnapshotMappingService {
             String accountId,
             Agg agg,
             OfflineAccountTracker tracker,
-            Anomaly anomaly,
             int clusterSize,
             Instant generatedAt) {
         AccountFeatureSnapshot.Builder builder = AccountFeatureSnapshot.builder(accountId, generatedAt)
@@ -46,8 +37,7 @@ public class OfflineSnapshotMappingService {
                 .transactionCount24h(toInt(agg == null ? 0 : agg.n))
                 .uniqueCounterpartyCount24h(agg == null ? null : agg.symbols.size())
                 .graphClusterSize30d(clusterSize)
-                .riskNeighborCount30d(Math.max(0, clusterSize - 1))
-                .anomalyScoreLast(normalizeAnomaly(anomaly));
+                .riskNeighborCount30d(Math.max(0, clusterSize - 1));
 
         if (tracker != null) {
             int uniqueIps = tracker.getClientIPCount();
@@ -61,14 +51,6 @@ public class OfflineSnapshotMappingService {
             }
         }
         return builder.build();
-    }
-
-    private Double normalizeAnomaly(Anomaly anomaly) {
-        if (anomaly == null) {
-            return null;
-        }
-        double peak = Math.max(Math.max(Math.max(0.0d, anomaly.z500), Math.max(0.0d, anomaly.z1s)), Math.max(0.0d, anomaly.zQA));
-        return Math.min(100.0d, Math.round((peak / 6.0d) * 10000.0d) / 100.0d);
     }
 
     private int countClientTypes(String clientTypes) {

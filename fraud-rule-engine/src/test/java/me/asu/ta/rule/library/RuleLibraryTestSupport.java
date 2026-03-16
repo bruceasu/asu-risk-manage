@@ -2,6 +2,7 @@ package me.asu.ta.rule.library;
 
 import java.time.Instant;
 import java.util.Map;
+import me.asu.ta.OfflineBehaviorContextKeys;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import me.asu.ta.rule.model.EvaluationMode;
 import me.asu.ta.rule.model.RuleConfig;
@@ -50,8 +51,7 @@ public final class RuleLibraryTestSupport {
                 .sharedIpAccounts7d(1)
                 .sharedBankAccounts30d(1)
                 .graphClusterSize30d(2)
-                .riskNeighborCount30d(0)
-                .anomalyScoreLast(0.08d);
+                .riskNeighborCount30d(0);
     }
 
     public static RuleEvaluationContext context(AccountFeatureSnapshot snapshot) {
@@ -62,6 +62,29 @@ public final class RuleLibraryTestSupport {
                 EvaluationMode.REALTIME,
                 Map.of(),
                 Map.of("snapshot", snapshot));
+    }
+
+    public static RuleEvaluationContext context(AccountFeatureSnapshot snapshot, Map<String, Object> attributes) {
+        java.util.Map<String, Object> merged = new java.util.LinkedHashMap<>();
+        merged.put("snapshot", snapshot);
+        if (attributes != null) {
+            merged.putAll(attributes);
+        }
+        return new RuleEvaluationContext(
+                snapshot.accountId(),
+                FIXED_TIME,
+                snapshot.featureVersion(),
+                EvaluationMode.REALTIME,
+                Map.of(),
+                Map.copyOf(merged));
+    }
+
+    public static Map<String, Object> behaviorContextSignals() {
+        return Map.of(
+                OfflineBehaviorContextKeys.BEHAVIOR_CLUSTER_SIZE, 5,
+                OfflineBehaviorContextKeys.SIMILAR_ACCOUNT_COUNT, 4,
+                OfflineBehaviorContextKeys.BEHAVIOR_MAX_SIMILARITY, 0.97d,
+                OfflineBehaviorContextKeys.COORDINATED_TRADING_SCORE, 72.0d);
     }
 
     public static RuleConfig config(String ruleCode, int version, int scoreWeight, RuleSeverity severity, Map<String, Object> parameters) {

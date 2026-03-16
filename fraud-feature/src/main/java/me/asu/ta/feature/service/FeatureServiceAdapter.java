@@ -9,22 +9,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class FeatureServiceAdapter {
-    private final FeatureStoreService featureStoreService;
+    private final FeatureQueryService featureQueryService;
 
-    public FeatureServiceAdapter(FeatureStoreService featureStoreService) {
-        this.featureStoreService = featureStoreService;
+    public FeatureServiceAdapter(FeatureQueryService featureQueryService) {
+        this.featureQueryService = featureQueryService;
     }
 
     public Optional<RiskEngineFeatureView> getFeaturesForRiskEngine(String accountId) {
-        return featureStoreService.getLatestFeatures(accountId).map(this::toRiskEngineView);
+        return featureQueryService.getLatestFeatures(accountId).map(this::toRiskEngineView);
     }
 
     public Optional<MlFeatureView> getFeaturesForML(String accountId) {
-        return featureStoreService.getLatestFeatures(accountId).map(this::toMlFeatureView);
+        return featureQueryService.getLatestFeatures(accountId).map(this::toMlFeatureView);
     }
 
     public Optional<CaseReportFeatureView> getFeaturesForCaseReport(String accountId) {
-        return featureStoreService.getLatestFeatures(accountId).map(this::toCaseReportFeatureView);
+        return featureQueryService.getLatestFeatures(accountId).map(this::toCaseReportFeatureView);
     }
 
     private RiskEngineFeatureView toRiskEngineView(AccountFeatureSnapshot snapshot) {
@@ -38,8 +38,7 @@ public class FeatureServiceAdapter {
                 intValue(snapshot.sharedDeviceAccounts7d()),
                 booleanValue(snapshot.securityChangeBeforeWithdrawFlag24h()),
                 intValue(snapshot.graphClusterSize30d()),
-                intValue(snapshot.riskNeighborCount30d()),
-                doubleValue(snapshot.anomalyScoreLast()));
+                intValue(snapshot.riskNeighborCount30d()));
     }
 
     private MlFeatureView toMlFeatureView(AccountFeatureSnapshot snapshot) {
@@ -54,8 +53,7 @@ public class FeatureServiceAdapter {
                 doubleValue(snapshot.depositWithdrawRatio24h()),
                 intValue(snapshot.deviceSwitchCount24h()),
                 intValue(snapshot.securityEventCount24h()),
-                intValue(snapshot.graphClusterSize30d()),
-                doubleValue(snapshot.anomalyScoreLast()));
+                intValue(snapshot.graphClusterSize30d()));
     }
 
     private CaseReportFeatureView toCaseReportFeatureView(AccountFeatureSnapshot snapshot) {
@@ -67,8 +65,7 @@ public class FeatureServiceAdapter {
                 booleanValue(snapshot.rapidWithdrawAfterDepositFlag24h()),
                 intValue(snapshot.sharedDeviceAccounts7d()),
                 intValue(snapshot.graphClusterSize30d()),
-                intValue(snapshot.riskNeighborCount30d()),
-                doubleValue(snapshot.anomalyScoreLast()));
+                intValue(snapshot.riskNeighborCount30d()));
     }
 
     private int intValue(Integer value) {

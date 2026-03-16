@@ -1,16 +1,13 @@
 package me.asu.ta.risk.service;
 
-import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import me.asu.ta.risk.classification.RiskLevelClassifier;
 import me.asu.ta.risk.model.BehaviorRiskSignal;
 import me.asu.ta.risk.model.GraphRiskSignal;
 import me.asu.ta.risk.model.MlAnomalySignal;
 import me.asu.ta.risk.model.RiskEvaluationRequest;
-import me.asu.ta.risk.model.RiskLevel;
 import me.asu.ta.risk.model.RiskScoreResult;
 import me.asu.ta.risk.model.RiskWeightProfile;
 import me.asu.ta.risk.model.ScoreBreakdown;
@@ -27,31 +24,44 @@ public class RiskEvaluationService {
     private static final int MAX_REASON_CODES = 5;
 
     private final BehaviorScoreCalculator behaviorScoreCalculator;
+    private final GraphRiskSignalResolver graphRiskSignalResolver;
     private final RiskWeightProfileService weightProfileService;
     private final RiskScoreCalculator riskScoreCalculator;
-    private final RiskLevelClassifier riskLevelClassifier;
     private final RiskReasonGenerator riskReasonGenerator;
+    private final RiskScoreResultFactory riskScoreResultFactory;
     private final RiskScoreResultRepository riskScoreResultRepository;
 
     public RiskEvaluationService(
             BehaviorScoreCalculator behaviorScoreCalculator,
+            GraphRiskSignalResolver graphRiskSignalResolver,
             RiskWeightProfileService weightProfileService,
             RiskScoreCalculator riskScoreCalculator,
-            RiskLevelClassifier riskLevelClassifier,
             RiskReasonGenerator riskReasonGenerator,
+            RiskScoreResultFactory riskScoreResultFactory,
             RiskScoreResultRepository riskScoreResultRepository) {
         this.behaviorScoreCalculator = behaviorScoreCalculator;
+        this.graphRiskSignalResolver = graphRiskSignalResolver;
         this.weightProfileService = weightProfileService;
         this.riskScoreCalculator = riskScoreCalculator;
-        this.riskLevelClassifier = riskLevelClassifier;
         this.riskReasonGenerator = riskReasonGenerator;
+        this.riskScoreResultFactory = riskScoreResultFactory;
         this.riskScoreResultRepository = riskScoreResultRepository;
     }
 
     public RiskScoreResult evaluateAccountRisk(RiskEvaluationRequest request, RuleEngineResult ruleEngineResult) {
-        GraphRiskSignal graphRiskSignal = resolveGraphRiskSignal(request);
-        MlAnomalySignal mlAnomalySignal = resolveMlAnomalySignal(request.snapshot(), request.mlAnomalySignal(), request.resolvedEvaluationTime());
-        BehaviorRiskSignal behaviorRiskSignal = behaviorScoreCalculator.calculate(request.snapshot());
+        EvaluationArtifacts artifacts = evaluateArtifacts(request, ruleEngineResult);
+        RiskScoreResult result = riskScoreResultFactory.build(
+                request,
+                artifacts.scoreBreakdown(),
+                artifacts.profile(),
+                artifacts.reasonCodes());
+        return riskScoreResultRepository.saveRiskScoreResult(result);
+    }
+
+    private EvaluationArtifacts evaluateArtifacts(RiskEvaluationRequest request, RuleEngineResult ruleEngineResult) {
+        GraphRiskSignal graphRiskSignal = graphRiskSignalResolver.resolve(request);
+        MlAnomalySignal mlAnomalySignal = request.mlAnomalySignal();
+        BehaviorRiskSignal behaviorRiskSignal = behaviorScoreCalculator.calculate(request.snapshot(), request.contextSignals());
         RiskWeightProfile profile = weightProfileService.resolveProfile(mlAnomalySignal != null);
         ScoreBreakdown scoreBreakdown = riskScoreCalculator.calculate(
                 ruleEngineResult,
@@ -59,25 +69,13 @@ public class RiskEvaluationService {
                 mlAnomalySignal,
                 behaviorRiskSignal,
                 profile);
-        RiskLevel riskLevel = riskLevelClassifier.classify(scoreBreakdown.finalScore());
         List<String> reasonCodes = riskReasonGenerator.generateTopReasonCodes(
                 ruleEngineResult,
                 graphRiskSignal,
                 mlAnomalySignal,
                 behaviorRiskSignal,
                 MAX_REASON_CODES);
-        RiskScoreResult result = new RiskScoreResult(
-                0L,
-                request.accountId(),
-                scoreBreakdown.finalScore(),
-                riskLevel,
-                profile.profileName(),
-                request.snapshot().featureVersion(),
-                request.resolvedEvaluationTime(),
-                request.resolvedEvaluationMode(),
-                reasonCodes,
-                scoreBreakdown);
-        return riskScoreResultRepository.saveRiskScoreResult(result);
+        return new EvaluationArtifacts(profile, scoreBreakdown, reasonCodes);
     }
 
     public Map<String, RiskScoreResult> evaluateBatchRisk(
@@ -94,45 +92,10 @@ public class RiskEvaluationService {
         return results;
     }
 
-    private GraphRiskSignal resolveGraphRiskSignal(RiskEvaluationRequest request) {
-        if (request.graphRiskSignal() != null) {
-            return request.graphRiskSignal();
-        }
-        AccountFeatureSnapshot snapshot = request.snapshot();
-        double score = 0.0d;
-        if (intValue(snapshot.riskNeighborCount30d()) >= 3) {
-            score += 40.0d;
-        }
-        if (intValue(snapshot.graphClusterSize30d()) >= 5) {
-            score += 30.0d;
-        }
-        if (intValue(snapshot.sharedDeviceAccounts7d()) >= 5) {
-            score += 15.0d;
-        }
-        if (intValue(snapshot.sharedBankAccounts30d()) >= 3) {
-            score += 15.0d;
-        }
-        return new GraphRiskSignal(
-                Math.min(score, 100.0d),
-                intValue(snapshot.graphClusterSize30d()),
-                intValue(snapshot.riskNeighborCount30d()),
-                intValue(snapshot.sharedDeviceAccounts7d()),
-                intValue(snapshot.sharedBankAccounts30d()));
-    }
-
-    private MlAnomalySignal resolveMlAnomalySignal(AccountFeatureSnapshot snapshot, MlAnomalySignal signal, Instant evaluationTime) {
-        if (signal != null) {
-            return signal;
-        }
-        if (snapshot.anomalyScoreLast() == null) {
-            return null;
-        }
-        double raw = snapshot.anomalyScoreLast();
-        double normalized = raw <= 1.0d ? raw * 100.0d : Math.min(raw, 100.0d);
-        return new MlAnomalySignal(raw, normalized, "feature_snapshot_anomaly", evaluationTime);
-    }
-
-    private int intValue(Integer value) {
-        return value == null ? 0 : value;
+    private record EvaluationArtifacts(
+            RiskWeightProfile profile,
+            ScoreBreakdown scoreBreakdown,
+            List<String> reasonCodes
+    ) {
     }
 }

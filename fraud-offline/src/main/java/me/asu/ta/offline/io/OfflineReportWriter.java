@@ -7,6 +7,8 @@ import java.util.Map;
 import me.asu.ta.Anomaly;
 import me.asu.ta.BaselineStats;
 import me.asu.ta.FxReplayWriter;
+import me.asu.ta.offline.analysis.BehaviorClusterMember;
+import me.asu.ta.offline.analysis.BehaviorSimilarityEdge;
 import me.asu.ta.risk.model.RiskScoreResult;
 
 public final class OfflineReportWriter {
@@ -37,5 +39,47 @@ public final class OfflineReportWriter {
                         .append(" reasons=").append(result.topReasonCodes())
                         .append(System.lineSeparator()));
         Files.writeString(out, builder.toString(), java.nio.file.StandardOpenOption.APPEND);
+    }
+
+    public void writeBehaviorReport(
+            Path out,
+            int featureCount,
+            List<BehaviorClusterMember> clusters,
+            List<BehaviorSimilarityEdge> edges) throws Exception {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Behavior Cluster Report").append(System.lineSeparator());
+        builder.append("-----------------------").append(System.lineSeparator());
+        builder.append("feature_vectors=").append(featureCount).append(System.lineSeparator());
+        builder.append("cluster_members=").append(clusters.size()).append(System.lineSeparator());
+        builder.append("similarity_edges=").append(edges.size()).append(System.lineSeparator());
+        builder.append(System.lineSeparator());
+        builder.append("Top Clusters").append(System.lineSeparator());
+        clusters.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        BehaviorClusterMember::clusterId,
+                        java.util.LinkedHashMap::new,
+                        java.util.stream.Collectors.toList()))
+                .entrySet().stream()
+                .sorted((left, right) -> Integer.compare(
+                        right.getValue().get(0).clusterSize(),
+                        left.getValue().get(0).clusterSize()))
+                .limit(5)
+                .forEach(entry -> builder.append("cluster=")
+                        .append(entry.getKey())
+                        .append(" size=").append(entry.getValue().get(0).clusterSize())
+                        .append(" note=").append(entry.getValue().get(0).note())
+                        .append(" accounts=")
+                        .append(entry.getValue().stream().map(BehaviorClusterMember::accountId).toList())
+                        .append(System.lineSeparator()));
+        builder.append(System.lineSeparator());
+        builder.append("Top Similarity Edges").append(System.lineSeparator());
+        edges.stream()
+                .limit(10)
+                .forEach(edge -> builder.append(edge.leftAccountId())
+                        .append(" <-> ").append(edge.rightAccountId())
+                        .append(" similarity=").append(edge.similarity())
+                        .append(" ranks=").append(edge.leftRank()).append("/").append(edge.rightRank())
+                        .append(System.lineSeparator()));
+        Files.writeString(out, builder.toString());
     }
 }

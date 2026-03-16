@@ -2,6 +2,7 @@ package me.asu.ta.risk.reason;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import javax.sql.DataSource;
@@ -23,6 +24,7 @@ class RiskReasonGeneratorTest {
         RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("GRAPH_SHARED_DEVICE_CLUSTER", RuleSeverity.HIGH, "GRAPH"));
         RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("ML_ANOMALY_HIGH", RuleSeverity.HIGH, "ML"));
         RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("BEHAVIOR_HIGH_RISK_IP_ACTIVITY", RuleSeverity.MEDIUM, "BEHAVIOR"));
+        RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("BEHAVIOR_OFFLINE_COORDINATED_TRADING", RuleSeverity.HIGH, "BEHAVIOR"));
 
         RiskReasonGenerator generator = new RiskReasonGenerator(RiskTestSupport.riskReasonMappingRepository(dataSource));
         RuleEngineResult ruleResult = new RuleEngineResult(
@@ -39,7 +41,7 @@ class RiskReasonGeneratorTest {
                 ruleResult,
                 new GraphRiskSignal(75.0d, 6, 4, 5, 1),
                 new MlAnomalySignal(0.88d, 88.0d, "risk-model", RiskTestSupport.FIXED_TIME),
-                new BehaviorRiskSignal(20.0d, java.util.Map.of(), List.of("BEHAVIOR_HIGH_RISK_IP_ACTIVITY")),
+                new BehaviorRiskSignal(35.0d, java.util.Map.of(), List.of("BEHAVIOR_HIGH_RISK_IP_ACTIVITY", "BEHAVIOR_OFFLINE_COORDINATED_TRADING")),
                 5);
 
         assertEquals("GRAPH_HIGH_RISK_NEIGHBORS", reasonCodes.getFirst());
@@ -49,7 +51,44 @@ class RiskReasonGeneratorTest {
                 "GRAPH_HIGH_RISK_NEIGHBORS",
                 "GRAPH_SHARED_DEVICE_CLUSTER",
                 "ML_ANOMALY_HIGH",
-                "GRAPH_LARGE_CLUSTER",
-                "BEHAVIOR_HIGH_RISK_IP_ACTIVITY"), reasonCodes);
+                "BEHAVIOR_OFFLINE_COORDINATED_TRADING",
+                "GRAPH_LARGE_CLUSTER"), reasonCodes);
+    }
+
+    @Test
+    void shouldGenerateReasonCandidatesFromEachSignalSource() throws Exception {
+        DataSource dataSource = RiskTestSupport.createDataSource();
+        RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("RULE_TAKEOVER", RuleSeverity.CRITICAL, "RULE"));
+        RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("ML_ANOMALY_MEDIUM", RuleSeverity.MEDIUM, "ML"));
+        RiskTestSupport.insertReasonMapping(dataSource, RiskTestSupport.reasonMapping("BEHAVIOR_HIGH_RISK_IP_ACTIVITY", RuleSeverity.MEDIUM, "BEHAVIOR"));
+
+        RiskReasonGenerator generator = new RiskReasonGenerator(RiskTestSupport.riskReasonMappingRepository(dataSource));
+        RuleEngineResult ruleResult = new RuleEngineResult(
+                "acct-risk-4",
+                EvaluationMode.BATCH,
+                RiskTestSupport.FIXED_TIME,
+                80,
+                List.of(new RuleEvaluationResult(
+                        "RULE_A",
+                        1,
+                        true,
+                        RuleSeverity.CRITICAL,
+                        80,
+                        "RULE_TAKEOVER",
+                        "Account takeover pattern",
+                        java.util.Map.of())),
+                List.of("RULE_TAKEOVER"));
+
+        List<String> reasonCodes = generator.generateTopReasonCodes(
+                ruleResult,
+                new GraphRiskSignal(40.0d, 2, 0, 0, 3),
+                new MlAnomalySignal(0.62d, 62.0d, "risk-model", RiskTestSupport.FIXED_TIME),
+                new BehaviorRiskSignal(20.0d, java.util.Map.of(), List.of("BEHAVIOR_HIGH_RISK_IP_ACTIVITY")),
+                6);
+
+        assertTrue(reasonCodes.contains("RULE_TAKEOVER"));
+        assertTrue(reasonCodes.contains("GRAPH_SHARED_BANK_CLUSTER"));
+        assertTrue(reasonCodes.contains("ML_ANOMALY_MEDIUM"));
+        assertTrue(reasonCodes.contains("BEHAVIOR_HIGH_RISK_IP_ACTIVITY"));
     }
 }

@@ -13,6 +13,10 @@ public final class OutputOptions {
     private final Path report;
     private final Path chart;
     private final Path botIndicators;
+    private final Path behaviorFeatures;
+    private final Path behaviorClusters;
+    private final Path similarityEdges;
+    private final Path behaviorReport;
 
     OutputOptions(
             Path detail,
@@ -24,7 +28,11 @@ public final class OutputOptions {
             Path cluster,
             Path report,
             Path chart,
-            Path botIndicators) {
+            Path botIndicators,
+            Path behaviorFeatures,
+            Path behaviorClusters,
+            Path similarityEdges,
+            Path behaviorReport) {
         this.detail = detail;
         this.aggAccountSymbol = aggAccountSymbol;
         this.aggAccount = aggAccount;
@@ -35,6 +43,10 @@ public final class OutputOptions {
         this.report = report;
         this.chart = chart;
         this.botIndicators = botIndicators;
+        this.behaviorFeatures = behaviorFeatures;
+        this.behaviorClusters = behaviorClusters;
+        this.similarityEdges = similarityEdges;
+        this.behaviorReport = behaviorReport;
     }
 
     public Path getDetail() {
@@ -75,5 +87,21 @@ public final class OutputOptions {
 
     public Path getBotIndicators() {
         return botIndicators;
+    }
+
+    public Path getBehaviorFeatures() {
+        return behaviorFeatures;
+    }
+
+    public Path getBehaviorClusters() {
+        return behaviorClusters;
+    }
+
+    public Path getSimilarityEdges() {
+        return similarityEdges;
+    }
+
+    public Path getBehaviorReport() {
+        return behaviorReport;
     }
 }

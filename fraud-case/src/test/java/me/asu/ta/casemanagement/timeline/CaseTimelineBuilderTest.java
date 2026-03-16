@@ -17,7 +17,8 @@ class CaseTimelineBuilderTest {
                 100L,
                 CaseTestSupport.snapshotBuilder("acct-timeline").build(),
                 CaseTestSupport.sampleRuleEngineResult("acct-timeline"),
-                CaseTestSupport.sampleRiskScoreResult("acct-timeline"));
+                CaseTestSupport.sampleRiskScoreResult("acct-timeline"),
+                CaseTestSupport.sampleBehaviorContextSignals());
 
         assertTrue(timeline.size() >= 8);
         assertEquals("LOGIN_PATTERN", timeline.getFirst().eventType());
@@ -28,6 +29,7 @@ class CaseTimelineBuilderTest {
         assertTrue(timeline.stream().anyMatch(event -> "PASSWORD_RESET".equals(event.eventType())));
         assertTrue(timeline.stream().anyMatch(event -> "DEPOSIT_ACTIVITY".equals(event.eventType())));
         assertTrue(timeline.stream().anyMatch(event -> "WITHDRAWAL_ACTIVITY".equals(event.eventType())));
+        assertTrue(timeline.stream().anyMatch(event -> "BEHAVIOR_CLUSTER_SIGNAL".equals(event.eventType())));
         for (int i = 1; i < timeline.size(); i++) {
             assertTrue(!timeline.get(i).eventTime().isBefore(timeline.get(i - 1).eventTime()));
         }

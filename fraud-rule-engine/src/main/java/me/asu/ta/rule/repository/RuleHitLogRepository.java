@@ -43,6 +43,21 @@ public class RuleHitLogRepository {
         return jdbcTemplate.query(sql, new MapSqlParameterSource("ruleCode", ruleCode), ROW_MAPPER);
     }
 
+    public List<RuleHitLog> findLatestByAccountId(String accountId, int limit) {
+        String sql = """
+                select * from rule_hit_log
+                 where account_id = :accountId
+                 order by hit_time desc, hit_id desc
+                 limit :limit
+                """;
+        return jdbcTemplate.query(
+                sql,
+                new MapSqlParameterSource()
+                        .addValue("accountId", accountId)
+                        .addValue("limit", limit),
+                ROW_MAPPER);
+    }
+
     private MapSqlParameterSource params(RuleHitLog hitLog) {
         return new MapSqlParameterSource()
                 .addValue("accountId", hitLog.accountId())

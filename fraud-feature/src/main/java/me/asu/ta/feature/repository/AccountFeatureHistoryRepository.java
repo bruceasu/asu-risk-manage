@@ -33,7 +33,7 @@ public class AccountFeatureHistoryRepository {
                     rapid_withdraw_after_deposit_flag_24h, reward_transaction_count_30d, reward_withdraw_delay_avg_30d,
                     unique_device_count_7d, device_switch_count_24h, shared_device_accounts_7d, security_event_count_24h,
                     rapid_profile_change_flag_24h, security_change_before_withdraw_flag_24h, shared_ip_accounts_7d,
-                    shared_bank_accounts_30d, graph_cluster_size_30d, risk_neighbor_count_30d, anomaly_score_last
+                    shared_bank_accounts_30d, graph_cluster_size_30d, risk_neighbor_count_30d
                 ) values (
                     :snapshotTime, :accountId, :featureVersion, :accountAgeDays, :kycLevelNumeric,
                     :registrationIpRiskScore, :loginCount24h, :loginFailureCount24h, :loginFailureRate24h,
@@ -44,7 +44,7 @@ public class AccountFeatureHistoryRepository {
                     :rapidWithdrawAfterDepositFlag24h, :rewardTransactionCount30d, :rewardWithdrawDelayAvg30d,
                     :uniqueDeviceCount7d, :deviceSwitchCount24h, :sharedDeviceAccounts7d, :securityEventCount24h,
                     :rapidProfileChangeFlag24h, :securityChangeBeforeWithdrawFlag24h, :sharedIpAccounts7d,
-                    :sharedBankAccounts30d, :graphClusterSize30d, :riskNeighborCount30d, :anomalyScoreLast
+                    :sharedBankAccounts30d, :graphClusterSize30d, :riskNeighborCount30d
                 )
                 """;
         return jdbcTemplate.update(sql, params(history));
@@ -89,8 +89,7 @@ public class AccountFeatureHistoryRepository {
                        shared_ip_accounts_7d = :sharedIpAccounts7d,
                        shared_bank_accounts_30d = :sharedBankAccounts30d,
                        graph_cluster_size_30d = :graphClusterSize30d,
-                       risk_neighbor_count_30d = :riskNeighborCount30d,
-                       anomaly_score_last = :anomalyScoreLast
+                       risk_neighbor_count_30d = :riskNeighborCount30d
                  where snapshot_id = :snapshotId
                 """;
         return jdbcTemplate.update(sql, params(history));
@@ -118,6 +117,23 @@ public class AccountFeatureHistoryRepository {
         return rows.stream().findFirst();
     }
 
+    public List<AccountFeatureHistory> findByAccountId(String accountId, int limit, int offset) {
+        String sql = """
+                select * from account_feature_history
+                 where account_id = :accountId
+                 order by snapshot_time desc, snapshot_id desc
+                 limit :limit
+                offset :offset
+                """;
+        return jdbcTemplate.query(
+                sql,
+                new MapSqlParameterSource()
+                        .addValue("accountId", accountId)
+                        .addValue("limit", limit)
+                        .addValue("offset", offset),
+                ROW_MAPPER);
+    }
+
     public int insertBatch(List<AccountFeatureHistory> histories) {
         String sql = """
                 insert into account_feature_history (
@@ -130,7 +146,7 @@ public class AccountFeatureHistoryRepository {
                     rapid_withdraw_after_deposit_flag_24h, reward_transaction_count_30d, reward_withdraw_delay_avg_30d,
                     unique_device_count_7d, device_switch_count_24h, shared_device_accounts_7d, security_event_count_24h,
                     rapid_profile_change_flag_24h, security_change_before_withdraw_flag_24h, shared_ip_accounts_7d,
-                    shared_bank_accounts_30d, graph_cluster_size_30d, risk_neighbor_count_30d, anomaly_score_last
+                    shared_bank_accounts_30d, graph_cluster_size_30d, risk_neighbor_count_30d
                 ) values (
                     :snapshotTime, :accountId, :featureVersion, :accountAgeDays, :kycLevelNumeric,
                     :registrationIpRiskScore, :loginCount24h, :loginFailureCount24h, :loginFailureRate24h,
@@ -141,7 +157,7 @@ public class AccountFeatureHistoryRepository {
                     :rapidWithdrawAfterDepositFlag24h, :rewardTransactionCount30d, :rewardWithdrawDelayAvg30d,
                     :uniqueDeviceCount7d, :deviceSwitchCount24h, :sharedDeviceAccounts7d, :securityEventCount24h,
                     :rapidProfileChangeFlag24h, :securityChangeBeforeWithdrawFlag24h, :sharedIpAccounts7d,
-                    :sharedBankAccounts30d, :graphClusterSize30d, :riskNeighborCount30d, :anomalyScoreLast
+                    :sharedBankAccounts30d, :graphClusterSize30d, :riskNeighborCount30d
                 )
                 """;
         return jdbcTemplate.batchUpdate(sql, histories.stream().map(this::params).toArray(MapSqlParameterSource[]::new)).length;
@@ -186,8 +202,7 @@ public class AccountFeatureHistoryRepository {
                 .addValue("sharedIpAccounts7d", history.sharedIpAccounts7d())
                 .addValue("sharedBankAccounts30d", history.sharedBankAccounts30d())
                 .addValue("graphClusterSize30d", history.graphClusterSize30d())
-                .addValue("riskNeighborCount30d", history.riskNeighborCount30d())
-                .addValue("anomalyScoreLast", history.anomalyScoreLast());
+                .addValue("riskNeighborCount30d", history.riskNeighborCount30d());
     }
 
     private static final class AccountFeatureHistoryRowMapper implements RowMapper<AccountFeatureHistory> {
@@ -231,8 +246,7 @@ public class AccountFeatureHistoryRepository {
                     (Integer) rs.getObject("shared_ip_accounts_7d"),
                     (Integer) rs.getObject("shared_bank_accounts_30d"),
                     (Integer) rs.getObject("graph_cluster_size_30d"),
-                    (Integer) rs.getObject("risk_neighbor_count_30d"),
-                    (Double) rs.getObject("anomaly_score_last"));
+                    (Integer) rs.getObject("risk_neighbor_count_30d"));
         }
 
         private Instant toInstant(Timestamp timestamp) {

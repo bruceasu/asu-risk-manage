@@ -176,12 +176,18 @@ public class CaseManagementService {
         CaseRiskSummary riskSummary = caseBuilder.buildRiskSummary(caseId, riskScoreResult);
         CaseGraphSummary graphSummary = caseBuilder.buildGraphSummary(caseId, request, riskScoreResult.generatedAt());
         List<CaseRuleHit> ruleHits = caseBuilder.buildRuleHits(caseId, ruleEngineResult, riskScoreResult.generatedAt());
-        List<CaseTimelineEvent> timelineEvents = caseTimelineBuilder.build(caseId, request.snapshot(), ruleEngineResult, riskScoreResult);
+        List<CaseTimelineEvent> timelineEvents = caseTimelineBuilder.build(
+                caseId,
+                request.snapshot(),
+                ruleEngineResult,
+                riskScoreResult,
+                request.contextSignals());
         List<CaseRecommendedAction> recommendedActions =
-                recommendationBuilder.build(caseId, request.snapshot(), ruleEngineResult, riskScoreResult);
+                recommendationBuilder.build(caseId, request.snapshot(), ruleEngineResult, riskScoreResult, request.contextSignals());
 
         riskSummaryRepository.save(riskSummary);
-        featureSummaryRepository.save(caseBuilder.buildFeatureSummary(caseId, request.snapshot(), riskScoreResult.generatedAt()));
+        featureSummaryRepository.save(
+                caseBuilder.buildFeatureSummary(caseId, request.snapshot(), request.mlAnomalySignal(), riskScoreResult.generatedAt()));
         graphSummaryRepository.save(graphSummary);
         ruleHitRepository.insertBatch(ruleHits);
         timelineEventRepository.insertBatch(timelineEvents);

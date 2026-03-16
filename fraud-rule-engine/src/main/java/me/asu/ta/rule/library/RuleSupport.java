@@ -11,6 +11,7 @@ import me.asu.ta.rule.model.params.CompositeRuleParams;
 import me.asu.ta.rule.model.params.DeviceRuleParams;
 import me.asu.ta.rule.model.params.GraphRuleParams;
 import me.asu.ta.rule.model.params.LoginRuleParams;
+import me.asu.ta.rule.model.params.OfflineBehaviorRuleParams;
 import me.asu.ta.rule.model.params.SecurityRuleParams;
 import me.asu.ta.rule.model.params.TransactionRuleParams;
 
@@ -24,6 +25,16 @@ public final class RuleSupport {
             return accountFeatureSnapshot;
         }
         throw new IllegalArgumentException("RuleEvaluationContext.attributes['snapshot'] must contain AccountFeatureSnapshot");
+    }
+
+    public static int intAttribute(RuleEvaluationContext context, String key, int defaultValue) {
+        Object value = context.attributes().get(key);
+        return value instanceof Number number ? number.intValue() : defaultValue;
+    }
+
+    public static double doubleAttribute(RuleEvaluationContext context, String key, double defaultValue) {
+        Object value = context.attributes().get(key);
+        return value instanceof Number number ? number.doubleValue() : defaultValue;
     }
 
     public static int intParam(RuleConfig config, String key, int defaultValue) {
@@ -63,6 +74,11 @@ public final class RuleSupport {
 
     public static CompositeRuleParams compositeParams(RuleConfig config) {
         return config.typedParameters(CompositeRuleParams.class).orElse(new CompositeRuleParams(null, null, null));
+    }
+
+    public static OfflineBehaviorRuleParams offlineBehaviorParams(RuleConfig config) {
+        return config.typedParameters(OfflineBehaviorRuleParams.class)
+                .orElse(new OfflineBehaviorRuleParams(null, null, null));
     }
 
     public static RuleEvaluationResult result(

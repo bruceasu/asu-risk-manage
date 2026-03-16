@@ -28,6 +28,8 @@ public class OfflineReplayFacadeIntegrationTest {
                 account_id,symbol,side,exec_time_ms,size,orderSize,takeProfit,stopLoss,eventText
                 A1,EURUSD,BUY,1000,1.0,1.0,,,
                 A1,EURUSD,SELL,2000,1.0,1.0,,,
+                A2,EURUSD,BUY,1100,1.0,1.0,,,
+                A2,EURUSD,SELL,2100,1.0,1.0,,,
                 """);
 
         FxReplayPlus.main(new String[] {
@@ -38,6 +40,8 @@ public class OfflineReplayFacadeIntegrationTest {
                 "--baseline",
                 "--report",
                 "--cluster",
+                "--behavior-cluster",
+                "--similarity-edges",
                 "--min-trades", "1"
         });
 
@@ -48,5 +52,9 @@ public class OfflineReplayFacadeIntegrationTest {
         Assert.assertTrue(Files.exists(outputDir.resolve("clusters.csv")));
         Assert.assertTrue(Files.exists(outputDir.resolve("risk_report.txt")));
         Assert.assertTrue(Files.exists(outputDir.resolve("bot_indicators.csv")));
+        Assert.assertTrue(Files.exists(outputDir.resolve("account_behavior_features.csv")));
+        Assert.assertTrue(Files.exists(outputDir.resolve("account_behavior_clusters.csv")));
+        Assert.assertTrue(Files.exists(outputDir.resolve("account_similarity_edges.csv")));
+        Assert.assertTrue(Files.exists(outputDir.resolve("behavior_cluster_report.txt")));
     }
 }

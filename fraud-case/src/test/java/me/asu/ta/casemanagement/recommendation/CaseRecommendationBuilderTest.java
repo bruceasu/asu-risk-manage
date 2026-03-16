@@ -16,12 +16,14 @@ class CaseRecommendationBuilderTest {
                 88L,
                 CaseTestSupport.snapshotBuilder("acct-recommendation").build(),
                 CaseTestSupport.sampleRuleEngineResult("acct-recommendation"),
-                CaseTestSupport.sampleRiskScoreResult("acct-recommendation"));
+                CaseTestSupport.sampleRiskScoreResult("acct-recommendation"),
+                CaseTestSupport.sampleBehaviorContextSignals());
 
         List<String> actionCodes = actions.stream().map(CaseRecommendedAction::actionCode).toList();
         assertTrue(actionCodes.contains("FREEZE_ACCOUNT"));
         assertTrue(actionCodes.contains("MANUAL_REVIEW"));
         assertTrue(actionCodes.contains("REVIEW_SECURITY_CHANGES"));
         assertTrue(actionCodes.contains("INVESTIGATE_LINKED_ACCOUNTS"));
+        assertTrue(actionCodes.contains("REVIEW_BEHAVIOR_CLUSTER"));
     }
 }

@@ -32,17 +32,17 @@
     - `graph`
     - `composite`
 
-推荐对外入口是 [RuleEngineFacade.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleEngineFacade.java)。
+推荐对外入口是 [RuleEngineFacade.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleEngineFacade.java)。
 
 ## How Rule Logic Is Structured
 
 规则逻辑依旧保持“配置在库里，逻辑在 Java 里”的结构：
 
-- 规则接口定义在 [FraudRule.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/api/FraudRule.java)
+- 规则接口定义在 [FraudRule.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/api/FraudRule.java)
 - 核心选择与执行由
-  - [RuleRegistry.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/engine/RuleRegistry.java)
-  - [RuleEngine.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/engine/RuleEngine.java)
-  - [RuleResultAggregator.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/engine/RuleResultAggregator.java)
+  - [RuleRegistry.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/engine/RuleRegistry.java)
+  - [RuleEngine.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/engine/RuleEngine.java)
+  - [RuleResultAggregator.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/engine/RuleResultAggregator.java)
   完成
 - 具体规则实现集中在 `me.asu.ta.rule.library.*`
 
@@ -64,8 +64,8 @@
 
 运行时：
 
-- [RuleConfigService.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleConfigService.java) 从 PostgreSQL 加载生效配置
-- [RuleParameterParser.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleParameterParser.java) 把 `parameter_json` 解析为：
+- [RuleConfigService.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleConfigService.java) 从 PostgreSQL 加载生效配置
+- [RuleParameterParser.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleParameterParser.java) 把 `parameter_json` 解析为：
   - 原始 `Map<String, Object>`
   - 校验后的 typed params
 
@@ -90,7 +90,7 @@
 
 ## How Rule Hot Reload Works
 
-热加载仍由 [RuleConfigService.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleConfigService.java) 负责：
+热加载仍由 [RuleConfigService.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleConfigService.java) 负责：
 
 - JVM 内缓存当前有效配置
 - `@Scheduled(fixedDelay = 30000)` 周期刷新
@@ -113,7 +113,7 @@
    - `rule_version`
 5. 运行 `mvn verify`
 
-如果需要新增外部上下文字段，优先通过 [RuleEngineFacadeContext.java](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/src/main/java/me/asu/ta/rule/model/RuleEngineFacadeContext.java) 的 `graphSignals` 或 `attributes` 透传，而不是修改底层 repository。
+如果需要新增外部上下文字段，优先通过 [RuleEngineFacadeContext.java](../fraud-rule-engine/src/main/java/me/asu/ta/rule/model/RuleEngineFacadeContext.java) 的 `graphSignals` 或 `attributes` 透传，而不是修改底层 repository。
 
 ## How BATCH and REALTIME Evaluation Differ
 
@@ -137,5 +137,5 @@
 
 规则初始化脚本位于：
 
-- [01_rule_definition_init.sql](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/sql/01_rule_definition_init.sql)
-- [02_rule_version_init.sql](/d:/03_projects/suk/asu-trading-analysis/fraud-rule-engine/sql/02_rule_version_init.sql)
+- [01_rule_definition_init.sql](sql/rule_definition_init.sql)
+- [02_rule_version_init.sql](sql/rule_version_init.sql)

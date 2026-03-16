@@ -5,6 +5,7 @@ classes/
 build/
 out/
 lib/
+.m2/
 *.class
 *.jar
 *.war

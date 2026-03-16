@@ -10,7 +10,6 @@ public record RiskEngineFeatureView(
         int sharedDeviceAccounts7d,
         boolean securityChangeBeforeWithdrawFlag24h,
         int graphClusterSize30d,
-        int riskNeighborCount30d,
-        double anomalyScoreLast
+        int riskNeighborCount30d
 ) {
 }

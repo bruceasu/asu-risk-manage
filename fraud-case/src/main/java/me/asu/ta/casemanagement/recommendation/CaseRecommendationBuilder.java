@@ -3,6 +3,8 @@ package me.asu.ta.casemanagement.recommendation;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import me.asu.ta.OfflineBehaviorContextKeys;
 import me.asu.ta.casemanagement.model.CaseRecommendedAction;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import me.asu.ta.risk.model.RiskLevel;
@@ -16,7 +18,8 @@ public class CaseRecommendationBuilder {
             long caseId,
             AccountFeatureSnapshot snapshot,
             RuleEngineResult ruleEngineResult,
-            RiskScoreResult riskScoreResult) {
+            RiskScoreResult riskScoreResult,
+            Map<String, Object> contextSignals) {
         List<CaseRecommendedAction> actions = new ArrayList<>();
         Instant createdAt = riskScoreResult.generatedAt();
         RiskLevel level = riskScoreResult.riskLevel();
@@ -40,10 +43,27 @@ public class CaseRecommendationBuilder {
                 || ruleEngineResult.reasonCodes().contains("GRAPH_SHARED_DEVICE_CLUSTER")) {
             actions.add(action(caseId, "INVESTIGATE_LINKED_ACCOUNTS", "Shared-device exposure indicates potentially linked suspicious accounts.", createdAt));
         }
+        if (doubleValue(contextSignals.get(OfflineBehaviorContextKeys.COORDINATED_TRADING_SCORE)) >= 60.0d) {
+            actions.add(action(
+                    caseId,
+                    "REVIEW_BEHAVIOR_CLUSTER",
+                    "Offline behavior clustering suggests coordinated trading behavior that should be reviewed manually.",
+                    createdAt));
+        }
         return actions.stream().distinct().toList();
     }
 
     private CaseRecommendedAction action(long caseId, String actionCode, String actionReason, Instant createdAt) {
         return new CaseRecommendedAction(0L, caseId, actionCode, actionReason, createdAt);
+    }
+
+    private double doubleValue(Object value) {
+        if (value instanceof Double doubleValue) {
+            return doubleValue;
+        }
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        }
+        return 0.0d;
     }
 }

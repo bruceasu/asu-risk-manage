@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import me.asu.ta.OfflineBehaviorContextKeys;
 import me.asu.ta.casemanagement.model.CaseTimelineEvent;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import me.asu.ta.risk.model.RiskScoreResult;
@@ -26,7 +27,8 @@ public class CaseTimelineBuilder {
             long caseId,
             AccountFeatureSnapshot snapshot,
             RuleEngineResult ruleEngineResult,
-            RiskScoreResult riskScoreResult) {
+            RiskScoreResult riskScoreResult,
+            Map<String, Object> contextSignals) {
         List<CaseTimelineEvent> timeline = new ArrayList<>();
         Instant createdAt = riskScoreResult.generatedAt();
 
@@ -148,6 +150,25 @@ public class CaseTimelineBuilder {
                     evidence));
         }
 
+        double coordinatedTradingScore = doubleValue(contextSignals.get(OfflineBehaviorContextKeys.COORDINATED_TRADING_SCORE));
+        int behaviorClusterSize = intValue(contextSignals.get(OfflineBehaviorContextKeys.BEHAVIOR_CLUSTER_SIZE));
+        int similarAccountCount = intValue(contextSignals.get(OfflineBehaviorContextKeys.SIMILAR_ACCOUNT_COUNT));
+        if (coordinatedTradingScore > 0.0d || behaviorClusterSize > 1 || similarAccountCount > 0) {
+            Map<String, Object> evidence = new LinkedHashMap<>();
+            evidence.put(OfflineBehaviorContextKeys.COORDINATED_TRADING_SCORE, coordinatedTradingScore);
+            evidence.put(OfflineBehaviorContextKeys.BEHAVIOR_CLUSTER_SIZE, behaviorClusterSize);
+            evidence.put(OfflineBehaviorContextKeys.SIMILAR_ACCOUNT_COUNT, similarAccountCount);
+            evidence.put(OfflineBehaviorContextKeys.BEHAVIOR_MAX_SIMILARITY, doubleValue(contextSignals.get(OfflineBehaviorContextKeys.BEHAVIOR_MAX_SIMILARITY)));
+            timeline.add(caseEvent(
+                    caseId,
+                    eventTime(createdAt, -10),
+                    createdAt,
+                    "BEHAVIOR_CLUSTER_SIGNAL",
+                    "Offline behavior cluster signal",
+                    "Offline analysis found behavior-level similarity or coordinated trading patterns around this account.",
+                    evidence));
+        }
+
         timeline.sort(Comparator.comparing(CaseTimelineEvent::eventTime).thenComparing(CaseTimelineEvent::createdAt));
         return timeline;
     }
@@ -181,12 +202,24 @@ public class CaseTimelineBuilder {
                 || intValue(snapshot.uniqueCounterpartyCount24h()) >= 8;
     }
 
-    private int intValue(Integer value) {
-        return value == null ? 0 : value;
+    private int intValue(Object value) {
+        if (value instanceof Integer integer) {
+            return integer;
+        }
+        if (value instanceof Number number) {
+            return number.intValue();
+        }
+        return 0;
     }
 
-    private double doubleValue(Double value) {
-        return value == null ? 0.0d : value;
+    private double doubleValue(Object value) {
+        if (value instanceof Double doubleValue) {
+            return doubleValue;
+        }
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        }
+        return 0.0d;
     }
 
     private String toJson(Object value) {

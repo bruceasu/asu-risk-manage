@@ -27,7 +27,7 @@ Unless explicitly instructed.
 # Validation Requirements
 Before finishing a task:
 Run:
-mvn verify
+mvn -s .mvn-local-settings.xml -DforkCount=0 verify
 If tests fail:
 - Fix tests
 - Or explain the failure.

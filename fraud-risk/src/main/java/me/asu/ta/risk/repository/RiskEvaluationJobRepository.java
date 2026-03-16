@@ -70,6 +70,16 @@ public class RiskEvaluationJobRepository {
         return rows.stream().findFirst();
     }
 
+    public Optional<RiskEvaluationJob> findLatest() {
+        String sql = """
+                select * from risk_evaluation_job
+                 order by started_at desc, job_id desc
+                 limit 1
+                """;
+        List<RiskEvaluationJob> rows = jdbcTemplate.query(sql, ROW_MAPPER);
+        return rows.stream().findFirst();
+    }
+
     private MapSqlParameterSource params(RiskEvaluationJob job) {
         return new MapSqlParameterSource()
                 .addValue("jobType", job.jobType())

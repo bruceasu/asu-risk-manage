@@ -11,7 +11,6 @@ public record MlFeatureView(
         double depositWithdrawRatio24h,
         int deviceSwitchCount24h,
         int securityEventCount24h,
-        int graphClusterSize30d,
-        double anomalyScoreLast
+        int graphClusterSize30d
 ) {
 }

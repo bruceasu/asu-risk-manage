@@ -28,42 +28,66 @@ public class RiskReasonGenerator {
             BehaviorRiskSignal behaviorRiskSignal,
             int limit) {
         Map<String, ReasonCandidate> ranked = new LinkedHashMap<>();
-        if (ruleEngineResult != null) {
-            for (RuleEvaluationResult hit : ruleEngineResult.hits()) {
-                merge(ranked, new ReasonCandidate(hit.reasonCode(), hit.severity(), 400));
-            }
-        }
-        if (graphRiskSignal != null) {
-            if (graphRiskSignal.riskNeighborCount() >= 3) {
-                merge(ranked, candidate("GRAPH_HIGH_RISK_NEIGHBORS", RuleSeverity.HIGH, 320));
-            }
-            if (graphRiskSignal.graphClusterSize() >= 5) {
-                merge(ranked, candidate("GRAPH_LARGE_CLUSTER", RuleSeverity.MEDIUM, 260));
-            }
-            if (graphRiskSignal.sharedDeviceAccounts() >= 5) {
-                merge(ranked, candidate("GRAPH_SHARED_DEVICE_CLUSTER", RuleSeverity.HIGH, 310));
-            }
-            if (graphRiskSignal.sharedBankAccounts() >= 3) {
-                merge(ranked, candidate("GRAPH_SHARED_BANK_CLUSTER", RuleSeverity.HIGH, 300));
-            }
-        }
-        if (mlAnomalySignal != null) {
-            if (mlAnomalySignal.anomalyScoreNormalized() >= 80.0d) {
-                merge(ranked, candidate("ML_ANOMALY_HIGH", RuleSeverity.HIGH, 250));
-            } else if (mlAnomalySignal.anomalyScoreNormalized() >= 60.0d) {
-                merge(ranked, candidate("ML_ANOMALY_MEDIUM", RuleSeverity.MEDIUM, 210));
-            }
-        }
-        if (behaviorRiskSignal != null) {
-            for (String reasonCode : behaviorRiskSignal.reasonCodes()) {
-                merge(ranked, candidate(reasonCode, RuleSeverity.MEDIUM, 220));
-            }
-        }
+        collectRuleReasonCandidates(ranked, ruleEngineResult);
+        collectGraphReasonCandidates(ranked, graphRiskSignal);
+        collectMlReasonCandidates(ranked, mlAnomalySignal);
+        collectBehaviorReasonCandidates(ranked, behaviorRiskSignal);
         return ranked.values().stream()
                 .sorted((left, right) -> Integer.compare(right.rank(), left.rank()))
                 .limit(Math.max(1, limit))
                 .map(ReasonCandidate::reasonCode)
                 .toList();
+    }
+
+    private void collectRuleReasonCandidates(Map<String, ReasonCandidate> ranked, RuleEngineResult ruleEngineResult) {
+        if (ruleEngineResult == null) {
+            return;
+        }
+        for (RuleEvaluationResult hit : ruleEngineResult.hits()) {
+            merge(ranked, new ReasonCandidate(hit.reasonCode(), hit.severity(), 400));
+        }
+    }
+
+    private void collectGraphReasonCandidates(Map<String, ReasonCandidate> ranked, GraphRiskSignal graphRiskSignal) {
+        if (graphRiskSignal == null) {
+            return;
+        }
+        if (graphRiskSignal.riskNeighborCount() >= 3) {
+            merge(ranked, candidate("GRAPH_HIGH_RISK_NEIGHBORS", RuleSeverity.HIGH, 320));
+        }
+        if (graphRiskSignal.sharedDeviceAccounts() >= 5) {
+            merge(ranked, candidate("GRAPH_SHARED_DEVICE_CLUSTER", RuleSeverity.HIGH, 310));
+        }
+        if (graphRiskSignal.sharedBankAccounts() >= 3) {
+            merge(ranked, candidate("GRAPH_SHARED_BANK_CLUSTER", RuleSeverity.HIGH, 300));
+        }
+        if (graphRiskSignal.graphClusterSize() >= 5) {
+            merge(ranked, candidate("GRAPH_LARGE_CLUSTER", RuleSeverity.MEDIUM, 260));
+        }
+    }
+
+    private void collectMlReasonCandidates(Map<String, ReasonCandidate> ranked, MlAnomalySignal mlAnomalySignal) {
+        if (mlAnomalySignal == null) {
+            return;
+        }
+        if (mlAnomalySignal.anomalyScoreNormalized() >= 80.0d) {
+            merge(ranked, candidate("ML_ANOMALY_HIGH", RuleSeverity.HIGH, 250));
+            return;
+        }
+        if (mlAnomalySignal.anomalyScoreNormalized() >= 60.0d) {
+            merge(ranked, candidate("ML_ANOMALY_MEDIUM", RuleSeverity.MEDIUM, 210));
+        }
+    }
+
+    private void collectBehaviorReasonCandidates(
+            Map<String, ReasonCandidate> ranked,
+            BehaviorRiskSignal behaviorRiskSignal) {
+        if (behaviorRiskSignal == null) {
+            return;
+        }
+        for (String reasonCode : behaviorRiskSignal.reasonCodes()) {
+            merge(ranked, candidate(reasonCode, RuleSeverity.MEDIUM, 220));
+        }
     }
 
     private ReasonCandidate candidate(String reasonCode, RuleSeverity fallbackSeverity, int sourcePriority) {

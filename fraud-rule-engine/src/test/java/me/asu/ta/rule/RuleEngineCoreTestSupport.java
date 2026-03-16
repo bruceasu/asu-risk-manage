@@ -146,8 +146,7 @@ public final class RuleEngineCoreTestSupport {
                 .sharedIpAccounts7d(1)
                 .sharedBankAccounts30d(1)
                 .graphClusterSize30d(2)
-                .riskNeighborCount30d(0)
-                .anomalyScoreLast(0.05d);
+                .riskNeighborCount30d(0);
     }
 
     private static void initializeSchema(DataSource dataSource) throws Exception {

@@ -8,7 +8,13 @@ import me.asu.ta.FxReplayCliOptions;
 import me.asu.ta.OutputOptions;
 import me.asu.ta.ReplayState;
 import me.asu.ta.offline.analysis.AnomalyAnalysisService;
+import me.asu.ta.offline.analysis.AccountBehaviorFeatureVector;
+import me.asu.ta.offline.analysis.AccountSimilarityAnalysisService;
 import me.asu.ta.offline.analysis.BaselineAnalysisService;
+import me.asu.ta.offline.analysis.BehaviorClusterAnalysisService;
+import me.asu.ta.offline.analysis.BehaviorClusterMember;
+import me.asu.ta.offline.analysis.BehaviorFeatureAnalysisService;
+import me.asu.ta.offline.analysis.BehaviorSimilarityEdge;
 import me.asu.ta.offline.analysis.BotIndicatorAnalysisService;
 import me.asu.ta.offline.analysis.ClusterAnalysisService;
 import me.asu.ta.offline.analysis.ReplayAnalysisService;
@@ -27,6 +33,9 @@ public final class OfflineReplayFacade {
     private final BotIndicatorAnalysisService botIndicatorAnalysisService;
     private final AnomalyAnalysisService anomalyAnalysisService;
     private final ClusterAnalysisService clusterAnalysisService;
+    private final BehaviorFeatureAnalysisService behaviorFeatureAnalysisService;
+    private final BehaviorClusterAnalysisService behaviorClusterAnalysisService;
+    private final AccountSimilarityAnalysisService accountSimilarityAnalysisService;
     private final OfflineCsvWriter csvWriter;
     private final OfflineReportWriter reportWriter;
     private final OfflineChartWriter chartWriter;
@@ -38,6 +47,9 @@ public final class OfflineReplayFacade {
                 new BotIndicatorAnalysisService(),
                 new AnomalyAnalysisService(),
                 new ClusterAnalysisService(),
+                new BehaviorFeatureAnalysisService(),
+                new BehaviorClusterAnalysisService(),
+                new AccountSimilarityAnalysisService(),
                 new OfflineCsvWriter(),
                 new OfflineReportWriter(),
                 new OfflineChartWriter());
@@ -49,6 +61,9 @@ public final class OfflineReplayFacade {
             BotIndicatorAnalysisService botIndicatorAnalysisService,
             AnomalyAnalysisService anomalyAnalysisService,
             ClusterAnalysisService clusterAnalysisService,
+            BehaviorFeatureAnalysisService behaviorFeatureAnalysisService,
+            BehaviorClusterAnalysisService behaviorClusterAnalysisService,
+            AccountSimilarityAnalysisService accountSimilarityAnalysisService,
             OfflineCsvWriter csvWriter,
             OfflineReportWriter reportWriter,
             OfflineChartWriter chartWriter) {
@@ -57,6 +72,9 @@ public final class OfflineReplayFacade {
         this.botIndicatorAnalysisService = botIndicatorAnalysisService;
         this.anomalyAnalysisService = anomalyAnalysisService;
         this.clusterAnalysisService = clusterAnalysisService;
+        this.behaviorFeatureAnalysisService = behaviorFeatureAnalysisService;
+        this.behaviorClusterAnalysisService = behaviorClusterAnalysisService;
+        this.accountSimilarityAnalysisService = accountSimilarityAnalysisService;
         this.csvWriter = csvWriter;
         this.reportWriter = reportWriter;
         this.chartWriter = chartWriter;
@@ -80,6 +98,7 @@ public final class OfflineReplayFacade {
         }
 
         botIndicatorAnalysisService.enrichDetailRows(state);
+        BehaviorOutputs behaviorOutputs = analyzeBehaviorIfEnabled(options, state);
         writeReplayOutputs(options, state);
 
         if (options.isCluster()) {
@@ -94,6 +113,8 @@ public final class OfflineReplayFacade {
                 reportWriter.appendIntegratedRiskSummary(options.getOutputs().getReport(), integrationResult.riskResults());
             }
         }
+
+        writeBehaviorOutputsIfEnabled(options, behaviorOutputs);
 
         if (options.isCharts()) {
             System.out.println("Writing charts: " + options.getOutputs().getChart());
@@ -161,6 +182,62 @@ public final class OfflineReplayFacade {
             System.out.println("Integrated snapshots: " + result.snapshots().size());
             System.out.println("Integrated risk results: " + result.riskResults().size());
             return result;
+        }
+    }
+
+    private BehaviorOutputs analyzeBehaviorIfEnabled(FxReplayCliOptions options, ReplayState state) {
+        if (!options.isBehaviorCluster() && !options.isSimilarityEdges()) {
+            return BehaviorOutputs.empty();
+        }
+        System.out.println("Computing account behavior feature vectors...");
+        Map<String, AccountBehaviorFeatureVector> features = behaviorFeatureAnalysisService.analyze(state, options.getMinTrades());
+        List<BehaviorClusterMember> clusters = options.isBehaviorCluster()
+                ? behaviorClusterAnalysisService.cluster(
+                        features,
+                        options.getBehaviorClusterK(),
+                        options.getBehaviorClusterThreshold())
+                : List.of();
+        List<BehaviorSimilarityEdge> edges = options.isSimilarityEdges()
+                ? accountSimilarityAnalysisService.analyze(
+                        features,
+                        options.getSimilarityThreshold(),
+                        options.getTopSimilarPerAccount())
+                : List.of();
+        return new BehaviorOutputs(features, clusters, edges);
+    }
+
+    private void writeBehaviorOutputsIfEnabled(FxReplayCliOptions options, BehaviorOutputs behaviorOutputs) throws Exception {
+        if (behaviorOutputs.isEmpty()) {
+            return;
+        }
+        System.out.println("Writing behavior features: " + options.getOutputs().getBehaviorFeatures());
+        csvWriter.writeBehaviorFeatures(options.getOutputs().getBehaviorFeatures(), behaviorOutputs.features());
+        if (options.isBehaviorCluster()) {
+            System.out.println("Writing behavior clusters: " + options.getOutputs().getBehaviorClusters());
+            csvWriter.writeBehaviorClusters(options.getOutputs().getBehaviorClusters(), behaviorOutputs.clusters());
+        }
+        if (options.isSimilarityEdges()) {
+            System.out.println("Writing similarity edges: " + options.getOutputs().getSimilarityEdges());
+            csvWriter.writeSimilarityEdges(options.getOutputs().getSimilarityEdges(), behaviorOutputs.edges());
+        }
+        System.out.println("Writing behavior report: " + options.getOutputs().getBehaviorReport());
+        reportWriter.writeBehaviorReport(
+                options.getOutputs().getBehaviorReport(),
+                behaviorOutputs.features().size(),
+                behaviorOutputs.clusters(),
+                behaviorOutputs.edges());
+    }
+
+    private record BehaviorOutputs(
+            Map<String, AccountBehaviorFeatureVector> features,
+            List<BehaviorClusterMember> clusters,
+            List<BehaviorSimilarityEdge> edges) {
+        static BehaviorOutputs empty() {
+            return new BehaviorOutputs(Map.of(), List.of(), List.of());
+        }
+
+        boolean isEmpty() {
+            return features.isEmpty() && clusters.isEmpty() && edges.isEmpty();
         }
     }
 }

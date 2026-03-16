@@ -10,11 +10,11 @@ import java.util.Map;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
-final class FeatureCalculatorSupport {
+public final class FeatureCalculatorSupport {
     private FeatureCalculatorSupport() {
     }
 
-    static Map<String, AccountFeatureSnapshot.Builder> initializeBuilders(
+    public static Map<String, AccountFeatureSnapshot.Builder> initializeBuilders(
             List<String> accountIds,
             Instant generatedAt,
             int featureVersion) {
@@ -25,23 +25,23 @@ final class FeatureCalculatorSupport {
         return builders;
     }
 
-    static MapSqlParameterSource batchParams(List<String> accountIds, Instant generatedAt, Duration window) {
+    public static MapSqlParameterSource batchParams(List<String> accountIds, Instant generatedAt, Duration window) {
         return new MapSqlParameterSource()
                 .addValue("accountIds", accountIds)
                 .addValue("generatedAt", java.sql.Timestamp.from(generatedAt))
                 .addValue("windowStart", java.sql.Timestamp.from(generatedAt.minus(window)));
     }
 
-    static Integer getInteger(ResultSet rs, String column) throws SQLException {
+    public static Integer getInteger(ResultSet rs, String column) throws SQLException {
         return (Integer) rs.getObject(column);
     }
 
-    static Double getDouble(ResultSet rs, String column) throws SQLException {
+    public static Double getDouble(ResultSet rs, String column) throws SQLException {
         Object value = rs.getObject(column);
         return value == null ? null : ((Number) value).doubleValue();
     }
 
-    static Boolean getBoolean(ResultSet rs, String column) throws SQLException {
+    public static Boolean getBoolean(ResultSet rs, String column) throws SQLException {
         return (Boolean) rs.getObject(column);
     }
 }

@@ -38,7 +38,5 @@ public class OfflineSnapshotMappingServiceTest {
         Assert.assertEquals(Integer.valueOf(2), snapshot.uniqueCounterpartyCount24h());
         Assert.assertEquals(Integer.valueOf(4), snapshot.graphClusterSize30d());
         Assert.assertEquals(Integer.valueOf(3), snapshot.riskNeighborCount30d());
-        Assert.assertNotNull(snapshot.anomalyScoreLast());
-        Assert.assertTrue(snapshot.anomalyScoreLast() > 0.0d);
     }
 }

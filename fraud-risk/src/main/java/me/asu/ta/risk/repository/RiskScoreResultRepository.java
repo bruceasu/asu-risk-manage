@@ -70,6 +70,23 @@ public class RiskScoreResultRepository {
         return rows.stream().findFirst();
     }
 
+    public List<RiskScoreResult> findHistoryByAccountId(String accountId, int limit, int offset) {
+        String sql = """
+                select * from risk_score_result
+                 where account_id = :accountId
+                 order by generated_at desc, score_id desc
+                 limit :limit
+                offset :offset
+                """;
+        return jdbcTemplate.query(
+                sql,
+                new MapSqlParameterSource()
+                        .addValue("accountId", accountId)
+                        .addValue("limit", limit)
+                        .addValue("offset", offset),
+                rowMapper);
+    }
+
     public int insertBatch(List<RiskScoreResult> results) {
         String sql = """
                 insert into risk_score_result(

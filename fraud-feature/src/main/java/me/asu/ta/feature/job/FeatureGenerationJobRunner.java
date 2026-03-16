@@ -6,7 +6,8 @@ import me.asu.ta.feature.model.AccountFeatureSnapshot;
 import me.asu.ta.feature.model.FeatureGenerationJob;
 import me.asu.ta.feature.repository.AccountBatchReader;
 import me.asu.ta.feature.repository.FeatureGenerationJobRepository;
-import me.asu.ta.feature.service.FeatureStoreService;
+import me.asu.ta.feature.service.FeatureGenerationService;
+import me.asu.ta.feature.service.FeaturePersistenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,15 +21,18 @@ public class FeatureGenerationJobRunner {
 
     private final FeatureGenerationJobRepository jobRepository;
     private final AccountBatchReader accountBatchReader;
-    private final FeatureStoreService featureStoreService;
+    private final FeatureGenerationService featureGenerationService;
+    private final FeaturePersistenceService featurePersistenceService;
 
     public FeatureGenerationJobRunner(
             FeatureGenerationJobRepository jobRepository,
             AccountBatchReader accountBatchReader,
-            FeatureStoreService featureStoreService) {
+            FeatureGenerationService featureGenerationService,
+            FeaturePersistenceService featurePersistenceService) {
         this.jobRepository = jobRepository;
         this.accountBatchReader = accountBatchReader;
-        this.featureStoreService = featureStoreService;
+        this.featureGenerationService = featureGenerationService;
+        this.featurePersistenceService = featurePersistenceService;
     }
 
     public FeatureGenerationJob runFullGeneration() {
@@ -124,11 +128,8 @@ public class FeatureGenerationJobRunner {
     }
 
     private void processBatch(long jobId, List<String> accountIds) {
-        List<AccountFeatureSnapshot> snapshots = featureStoreService.generateFeaturesBatch(accountIds);
-        for (AccountFeatureSnapshot snapshot : snapshots) {
-            featureStoreService.persistSnapshot(snapshot);
-            featureStoreService.persistHistory(snapshot);
-        }
+        List<AccountFeatureSnapshot> snapshots = featureGenerationService.generateFeaturesBatch(accountIds);
+        featurePersistenceService.persistBatch(snapshots);
         log.debug("Feature generation job {} persisted {} snapshots and histories", jobId, snapshots.size());
     }
 

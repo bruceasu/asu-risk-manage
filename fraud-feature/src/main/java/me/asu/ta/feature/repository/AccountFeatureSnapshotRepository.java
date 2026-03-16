@@ -33,7 +33,7 @@ public class AccountFeatureSnapshotRepository {
                     rapid_withdraw_after_deposit_flag_24h, reward_transaction_count_30d, reward_withdraw_delay_avg_30d,
                     unique_device_count_7d, device_switch_count_24h, shared_device_accounts_7d, security_event_count_24h,
                     rapid_profile_change_flag_24h, security_change_before_withdraw_flag_24h, shared_ip_accounts_7d,
-                    shared_bank_accounts_30d, graph_cluster_size_30d, risk_neighbor_count_30d, anomaly_score_last
+                    shared_bank_accounts_30d, graph_cluster_size_30d, risk_neighbor_count_30d
                 ) values (
                     :accountId, :featureVersion, :generatedAt, :accountAgeDays, :kycLevelNumeric,
                     :registrationIpRiskScore, :loginCount24h, :loginFailureCount24h, :loginFailureRate24h, :uniqueIpCount24h,
@@ -44,7 +44,7 @@ public class AccountFeatureSnapshotRepository {
                     :rapidWithdrawAfterDepositFlag24h, :rewardTransactionCount30d, :rewardWithdrawDelayAvg30d,
                     :uniqueDeviceCount7d, :deviceSwitchCount24h, :sharedDeviceAccounts7d, :securityEventCount24h,
                     :rapidProfileChangeFlag24h, :securityChangeBeforeWithdrawFlag24h, :sharedIpAccounts7d,
-                    :sharedBankAccounts30d, :graphClusterSize30d, :riskNeighborCount30d, :anomalyScoreLast
+                    :sharedBankAccounts30d, :graphClusterSize30d, :riskNeighborCount30d
                 )
                 on conflict (account_id) do update set
                     feature_version = excluded.feature_version,
@@ -82,8 +82,7 @@ public class AccountFeatureSnapshotRepository {
                     shared_ip_accounts_7d = excluded.shared_ip_accounts_7d,
                     shared_bank_accounts_30d = excluded.shared_bank_accounts_30d,
                     graph_cluster_size_30d = excluded.graph_cluster_size_30d,
-                    risk_neighbor_count_30d = excluded.risk_neighbor_count_30d,
-                    anomaly_score_last = excluded.anomaly_score_last
+                    risk_neighbor_count_30d = excluded.risk_neighbor_count_30d
                 """;
         return jdbcTemplate.update(sql, params(snapshot));
     }
@@ -126,8 +125,7 @@ public class AccountFeatureSnapshotRepository {
                        shared_ip_accounts_7d = :sharedIpAccounts7d,
                        shared_bank_accounts_30d = :sharedBankAccounts30d,
                        graph_cluster_size_30d = :graphClusterSize30d,
-                       risk_neighbor_count_30d = :riskNeighborCount30d,
-                       anomaly_score_last = :anomalyScoreLast
+                       risk_neighbor_count_30d = :riskNeighborCount30d
                  where account_id = :accountId
                 """;
         return jdbcTemplate.update(sql, params(snapshot));
@@ -160,7 +158,7 @@ public class AccountFeatureSnapshotRepository {
                     rapid_withdraw_after_deposit_flag_24h, reward_transaction_count_30d, reward_withdraw_delay_avg_30d,
                     unique_device_count_7d, device_switch_count_24h, shared_device_accounts_7d, security_event_count_24h,
                     rapid_profile_change_flag_24h, security_change_before_withdraw_flag_24h, shared_ip_accounts_7d,
-                    shared_bank_accounts_30d, graph_cluster_size_30d, risk_neighbor_count_30d, anomaly_score_last
+                    shared_bank_accounts_30d, graph_cluster_size_30d, risk_neighbor_count_30d
                 ) values (
                     :accountId, :featureVersion, :generatedAt, :accountAgeDays, :kycLevelNumeric,
                     :registrationIpRiskScore, :loginCount24h, :loginFailureCount24h, :loginFailureRate24h, :uniqueIpCount24h,
@@ -171,7 +169,7 @@ public class AccountFeatureSnapshotRepository {
                     :rapidWithdrawAfterDepositFlag24h, :rewardTransactionCount30d, :rewardWithdrawDelayAvg30d,
                     :uniqueDeviceCount7d, :deviceSwitchCount24h, :sharedDeviceAccounts7d, :securityEventCount24h,
                     :rapidProfileChangeFlag24h, :securityChangeBeforeWithdrawFlag24h, :sharedIpAccounts7d,
-                    :sharedBankAccounts30d, :graphClusterSize30d, :riskNeighborCount30d, :anomalyScoreLast
+                    :sharedBankAccounts30d, :graphClusterSize30d, :riskNeighborCount30d
                 )
                 on conflict (account_id) do update set
                     feature_version = excluded.feature_version,
@@ -209,8 +207,7 @@ public class AccountFeatureSnapshotRepository {
                     shared_ip_accounts_7d = excluded.shared_ip_accounts_7d,
                     shared_bank_accounts_30d = excluded.shared_bank_accounts_30d,
                     graph_cluster_size_30d = excluded.graph_cluster_size_30d,
-                    risk_neighbor_count_30d = excluded.risk_neighbor_count_30d,
-                    anomaly_score_last = excluded.anomaly_score_last
+                    risk_neighbor_count_30d = excluded.risk_neighbor_count_30d
                 """;
         return jdbcTemplate.batchUpdate(sql, snapshots.stream().map(this::params).toArray(MapSqlParameterSource[]::new)).length;
     }
@@ -253,8 +250,7 @@ public class AccountFeatureSnapshotRepository {
                 .addValue("sharedIpAccounts7d", snapshot.sharedIpAccounts7d())
                 .addValue("sharedBankAccounts30d", snapshot.sharedBankAccounts30d())
                 .addValue("graphClusterSize30d", snapshot.graphClusterSize30d())
-                .addValue("riskNeighborCount30d", snapshot.riskNeighborCount30d())
-                .addValue("anomalyScoreLast", snapshot.anomalyScoreLast());
+                .addValue("riskNeighborCount30d", snapshot.riskNeighborCount30d());
     }
 
     private static final class SnapshotRowMapper implements RowMapper<AccountFeatureSnapshot> {
@@ -296,7 +292,6 @@ public class AccountFeatureSnapshotRepository {
                     .sharedBankAccounts30d((Integer) rs.getObject("shared_bank_accounts_30d"))
                     .graphClusterSize30d((Integer) rs.getObject("graph_cluster_size_30d"))
                     .riskNeighborCount30d((Integer) rs.getObject("risk_neighbor_count_30d"))
-                    .anomalyScoreLast((Double) rs.getObject("anomaly_score_last"))
                     .build();
         }
 

@@ -12,6 +12,7 @@
         <module>fraud-core</module>
         <module>fraud-offline</module>
         <module>fraud-online</module>
+        <module>fraud-batch</module>
         <module>fraud-feature</module>
         <module>fraud-rule-engine</module>
         <module>fraud-risk</module>
@@ -33,7 +34,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>4.0.2</version>
+                <version>3.5.7</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

@@ -1,212 +1,186 @@
 # asu-risk-manage
 
-`asu-risk-manage` 是一个面向交易风控与欺诈分析的多模块 Maven 工程。
-它把离线回放、实时分析、特征沉淀、规则评估、图谱信号、统一风险评分、案件生成和 AI 报告组织在同一套体系内，方便按模块独立演进，也方便按链路联调。
+`asu-risk-manage` 是一个面向交易风控分析的多模块 Maven 工程，覆盖离线回放分析、特征生成、规则评估、统一风险评分、案件生成和 AI 报告。
 
-## 项目目标
+当前主链路已经收敛为：
 
-项目当前重点解决三类问题：
+`offline / batch / online -> feature / rule-engine / graph -> risk -> case -> ai`
 
-- 离线分析
-  - 基于交易与报价文件做 replay、markout、quote age、baseline、异常检测和聚类分析。
-- 在线风控
-  - 对实时事件流做轻量分析、风险打分和规则触发。
-- 统一风险闭环
-  - 将特征、规则、图谱、异常和行为信号汇总为统一风险结果，并沉淀为案件与 AI 调查报告。
-
-## 顶层架构
-
-仓库按“能力模块”而不是“技术层”拆分，顶层模块如下：
+## 模块概览
 
 | 模块 | 作用 |
 | --- | --- |
-| `fraud-core` | 公共 DTO、统计工具、基础模型与通用算法 |
-| `fraud-offline` | 离线批处理入口，负责文件输入、回放分析、辅助文件输出，以及可选接入当前体系 |
-| `fraud-online` | 实时风控演示与事件回放入口 |
-| `fraud-feature` | 账户特征快照、历史特征与特征存储能力 |
-| `fraud-rule-engine` | 规则评估、命中结果与规则侧证据 |
-| `fraud-risk` | 统一风险评分、风险等级、原因码与批量评估编排 |
-| `fraud-graph` | 关系边构建、连通簇分析、图谱信号与图风险摘要 |
-| `fraud-case` | 将风险结果整理为可审计、可调查的案件对象 |
-| `fraud-ai` | 基于案件对象生成结构化 AI 调查报告 |
-| `data-generator` | 示例数据与数据生成辅助内容 |
-| `docs` | 补充设计说明、参考文档和专题资料 |
+| `fraud-core` | 公共 DTO、统计工具、共享模型与通用常量 |
+| `fraud-offline` | 离线文件输入、replay、markout、行为分群、相似度分析、辅助报告 |
+| `fraud-batch` | 定期批量任务编排入口，负责 feature/risk/case 主链路调度 |
+| `fraud-online` | 查询 API、手动重算 API、事件驱动重算入口 |
+| `fraud-feature` | 账户特征快照、历史特征、特征生成与存储 |
+| `fraud-rule-engine` | 规则配置装载、规则执行、规则命中聚合与日志 |
+| `fraud-risk` | 统一风险评分、原因码生成、风险结果持久化 |
+| `fraud-graph` | 图边构建、图信号、图摘要 |
+| `fraud-case` | 调查案件、时间线、推荐动作、案件摘要 |
+| `fraud-ai` | AI 调查报告生成与解析 |
+| `docs` | 架构说明、专题文档、规格草案 |
 
-聚合工程定义见 [pom.xml](/d:/03_projects/suk/asu-risk-manage/pom.xml)。
+## 当前入口形态
 
-## 典型数据流
+### 1. `fraud-batch`
 
-### 1. 离线批处理链路
+`fraud-batch` 是正式的批处理编排入口，适合定时任务或调度平台调用。
 
-1. `fraud-offline` 读取 `trades.csv / quotes.csv`
-2. 完成 replay、markout、quote age、baseline、异常和聚类分析
-3. 生成辅助文件，如 `markout_detail.csv`、`baseline.csv`、`risk_report.txt`
-4. 如启用当前体系集成模式，再映射为：
-   - `AccountFeatureSnapshot`
-   - `MlAnomalySignal`
-   - `GraphRiskSignal`
-5. 调用 `fraud-feature` 与 `fraud-risk`，统一落入快照、历史与风险结果
+职责：
+- 刷新特征
+- 批量评估风险
+- 触发案件生成或更新
 
-### 2. 在线风控链路
+关键入口：
+- [FraudBatchApplication](fraud-batch/src/main/java/me/asu/ta/batch/FraudBatchApplication.java)
+- [BatchOrchestratorService](fraud-batch/src/main/java/me/asu/ta/batch/service/BatchOrchestratorService.java)
 
-1. `fraud-online` 消费实时事件或文件回放事件
-2. 生成账户侧实时统计与轻量风险信号
-3. 与规则、特征、图谱或后续风控引擎对接
+### 2. `fraud-online`
 
-### 3. 调查闭环链路
+`fraud-online` 是第一阶段的在线入口，负责查询和显式重算，不承担完整实时决策引擎职责。
 
-1. `fraud-risk` 产出统一风险结果
-2. `fraud-case` 组装案件主对象、时间线、规则命中和建议动作
-3. `fraud-ai` 基于案件对象生成结构化调查报告
+职责：
+- 查询账号最新风险与历史
+- 查询规则命中、特征快照、案件摘要
+- 手动触发单账号重算
+- 接收关键事件触发风险重算
 
-## 当前模块关系
+关键入口：
+- [FraudOnlineApplication](fraud-online/src/main/java/me/asu/ta/online/FraudOnlineApplication.java)
+- [AccountRiskController](fraud-online/src/main/java/me/asu/ta/online/controller/AccountRiskController.java)
+- [EventRiskController](fraud-online/src/main/java/me/asu/ta/online/controller/EventRiskController.java)
 
-可以把系统理解为下面这条主线：
+### 3. `fraud-offline`
 
-`offline / online -> feature / rule / graph -> risk -> case -> ai`
+`fraud-offline` 保持独立，主要用于：
+- 历史回放
+- 行为分群和行为相似分析
+- 补算与验证
+- 生成辅助分析材料
 
-其中：
+它不是日常查询主入口。
 
-- `fraud-core` 是横向公共能力，不直接承载业务编排。
-- `fraud-offline` 现在更像“离线入口和编排层”，而不是独立评分中心。
-- `fraud-risk` 是统一风险口径主落点。
-- `fraud-case` 和 `fraud-ai` 负责把机器结果转成可审计、可阅读、可行动的输出。
+## 当前架构重点
 
-## 快速开始
+### `fraud-risk` 已收口为评分核心
 
-### 环境要求
+`fraud-risk` 当前更适合看作核心 `lib`，同时保留轻量运行壳。
 
-- JDK `25`
-- Maven `3.9+`
-- 建议使用仓库内的本地 settings：
-  - `.mvn-local-settings.xml`
+关键组件：
+- [RiskEngineFacade](fraud-risk/src/main/java/me/asu/ta/risk/service/RiskEngineFacade.java)
+  - 跨模块稳定评分入口
+- [RiskEvaluationService](fraud-risk/src/main/java/me/asu/ta/risk/service/RiskEvaluationService.java)
+  - 统一评分编排层
+- [GraphRiskSignalResolver](fraud-risk/src/main/java/me/asu/ta/risk/service/GraphRiskSignalResolver.java)
+  - 图信号统一解析
+- [BehaviorScoreCalculator](fraud-risk/src/main/java/me/asu/ta/risk/scoring/BehaviorScoreCalculator.java)
+  - 行为信号计算
+- [RiskReasonGenerator](fraud-risk/src/main/java/me/asu/ta/risk/reason/RiskReasonGenerator.java)
+  - top reasons 合并与排序
+- [RiskScoreResultFactory](fraud-risk/src/main/java/me/asu/ta/risk/service/RiskScoreResultFactory.java)
+  - 风险结果装配
 
-Windows 下可先执行：
+### `fraud-rule-engine` 是共享规则内核
 
-```powershell
-.\setup-jdk25.ps1
-```
+`fraud-rule-engine` 当前定位是独立模块，不是系统主程序。
 
-### 编译整个工程
+关键组件：
+- [RuleEngineFacade](fraud-rule-engine/src/main/java/me/asu/ta/rule/service/RuleEngineFacade.java)
+- [RuleEngine](fraud-rule-engine/src/main/java/me/asu/ta/rule/engine/RuleEngine.java)
+- [RuleResultAggregator](fraud-rule-engine/src/main/java/me/asu/ta/rule/engine/RuleResultAggregator.java)
 
-```bash
-mvn -s .mvn-local-settings.xml clean compile
-```
+### 行为分析结果目前来自 `fraud-offline`
 
-### 运行离线分析
+当前已经支持：
+- `behavior feature vector`
+- `behavior cluster`
+- `behavior similarity edge`
 
-```bash
-java -cp fraud-offline/target/classes me.asu.ta.FxReplayPlus ^
-  --trades data/trades.csv ^
-  --quotes data/quotes.csv ^
-  --out-dir out ^
-  --agg-account ^
-  --baseline ^
-  --report ^
-  --cluster
-```
+这些结果属于辅助风控信号，不等同于实体关系图。
 
-如需把离线结果并入当前体系：
+## 典型调用链路
 
-```bash
-java -cp fraud-offline/target/classes me.asu.ta.FxReplayPlus ^
-  --trades data/trades.csv ^
-  --quotes data/quotes.csv ^
-  --out-dir out ^
-  --agg-account ^
-  --baseline ^
-  --report ^
-  --cluster ^
-  --integrate-current-system
-```
+### 定期批量计算
 
-### 运行实时演示
+1. 调度器调用 `fraud-batch`
+2. `fraud-batch` 刷新 `AccountFeatureSnapshot`
+3. `fraud-batch` 调用 `RiskEngineFacade`
+4. `fraud-risk` 内部调用 `RuleEngineFacade`
+5. 生成 `RiskScoreResult`
+6. 触发 `fraud-case` 生成或更新案件
 
-当前实时演示入口位于：
+### 事件驱动重算
 
-- [RealtimeRiskEngine.java](/d:/03_projects/suk/asu-risk-manage/fraud-online/src/src/main/java/me/asu/ta/RealtimeRiskEngine.java)
+1. 事件进入 `fraud-online`
+2. `fraud-online` 读取最新 snapshot 并补充事件上下文
+3. 调用 `RiskEngineFacade`
+4. 生成并返回新的风险结果
 
-更详细的编译与运行方式见：
+### 查询链路
 
-- [fraud-online/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-online/README.md)
+1. 查询请求进入 `fraud-online`
+2. 优先读取最新 `RiskScoreResult`
+3. 补充 `AccountFeatureSnapshot`、规则命中和案件摘要
+4. 返回账号风险总览或历史明细
 
-## 重点子模块入口
+### 离线分析链路
 
-Spring Boot 模块入口：
+1. `fraud-offline` 读取交易与报价文件
+2. 执行 replay、baseline、anomaly、行为分析
+3. 可选接入 `feature / risk / case`
+4. 输出辅助分析文件和报告
 
-- [FraudFeatureApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-feature/src/main/java/me/asu/ta/feature/FraudFeatureApplication.java)
-- [FraudRuleEngineCoreApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-rule-engine/src/main/java/me/asu/ta/rule/FraudRuleEngineCoreApplication.java)
-- [FraudRiskApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-risk/src/main/java/me/asu/ta/risk/FraudRiskApplication.java)
-- [FraudGraphApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-graph/src/main/java/me/asu/ta/graph/FraudGraphApplication.java)
-- [FraudCaseApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-case/src/main/java/me/asu/ta/casemanagement/FraudCaseApplication.java)
-- [FraudAiApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-ai/src/main/java/me/asu/ta/ai/FraudAiApplication.java)
+## 运行环境
 
-离线入口：
+- JDK 25
+- Maven 3.9+
+- Spring Boot 3.5.7
 
-- [FxReplayPlus.java](/d:/03_projects/suk/asu-risk-manage/fraud-offline/src/main/java/me/asu/ta/FxReplayPlus.java)
-- [OfflineReplayCliApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-offline/src/main/java/me/asu/ta/offline/OfflineReplayCliApplication.java)
-- [OfflineClusterCliApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-offline/src/main/java/me/asu/ta/offline/OfflineClusterCliApplication.java)
-- [OfflineReportCliApplication.java](/d:/03_projects/suk/asu-risk-manage/fraud-offline/src/main/java/me/asu/ta/offline/OfflineReportCliApplication.java)
-
-## 子模块文档
-
-建议按关注点继续阅读：
-
-- [fraud-offline/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-offline/README.md)
-- [fraud-risk/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-risk/README.md)
-- [fraud-graph/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-graph/README.md)
-- [fraud-case/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-case/README.md)
-- [fraud-ai/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-ai/README.md)
-- [docs/README.md](/d:/03_projects/suk/asu-risk-manage/docs/README.md)
-- [data-generator/README.md](/d:/03_projects/suk/asu-risk-manage/data-generator/README.md)
-
-## 输出与落点
-
-当前系统同时支持两类结果：
-
-- 辅助文件输出
-  - 主要由 `fraud-offline` 生成，用于人工排查、回放验证和分析。
-- 体系内结构化结果
-  - 主要包括特征快照、风险结果、图谱信号、案件对象和 AI 报告。
-
-推荐理解方式：
-
-- 文件是“分析材料”
-- 快照、风险、案件和报告是“系统主结果”
-
-## 构建与验证
-
-常用命令：
+## 常用命令
 
 ```bash
-mvn -s .mvn-local-settings.xml clean compile
+mvn clean compile
 mvn verify
 ```
 
-当前仓库有一个已知问题会影响全量 `verify`：
+### 启动批处理入口
 
-- [fraud-core/src/test/java/me/asu/AppTest.java](/d:/03_projects/suk/asu-risk-manage/fraud-core/src/test/java/me/asu/AppTest.java)
-  - 当前环境存在读取权限异常，会导致 reactor 在 `fraud-core:testCompile` 提前失败。
+```bash
+mvn -pl fraud-batch -am spring-boot:run
+```
 
-因此在问题修复前，建议把验证拆成两层：
+### 启动在线 API
 
-- 模块级编译验证
-  - 例如 `mvn -pl fraud-offline -am compile`
-- 定向测试验证
-  - 按具体模块执行对应测试
+```bash
+mvn -pl fraud-online -am spring-boot:run
+```
 
-## 当前约束
+### 运行离线 replay
 
-- 本仓库当前以最小依赖、显式 SQL、可审计逻辑为主，不引入重型图数据库或复杂 ORM。
-- `fraud-offline` 的部分离线明细仍以辅助文件形式暴露，不强行写入现有 schema。
-- `fraud-online` 当前更偏演示与验证入口，不等同于完整在线生产接入层。
-- 个别子模块 README 仍有历史编码遗留问题，根 README 以当前代码结构为准。
+```bash
+java -cp fraud-offline/target/classes me.asu.ta.FxReplayPlus ^
+  --trades data/trades.csv ^
+  --quotes data/quotes.csv ^
+  --out-dir out ^
+  --agg-account ^
+  --baseline ^
+  --report
+```
+
+## 当前注意事项
+
+- 查询默认查落库结果，不隐式触发重算。
+- `fraud-batch` 只负责编排，不重复实现评分逻辑。
+- `fraud-online` 当前不承担完整 allow/review/block 决策引擎职责。
+- `fraud-offline` 输出的行为分群和行为相似边属于辅助分析材料。
+- 当前全仓 Spring Boot 版本线已统一到 `3.5.7`。
 
 ## 推荐阅读顺序
 
-如果你是第一次接触这个项目，建议这样读：
-
-1. 先看本文件，建立整体模块视图
-2. 再看 [fraud-offline/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-offline/README.md) 和 [fraud-risk/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-risk/README.md)
-3. 如果关注关系分析，继续看 [fraud-graph/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-graph/README.md)
-4. 如果关注调查闭环，继续看 [fraud-case/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-case/README.md) 和 [fraud-ai/README.md](/d:/03_projects/suk/asu-risk-manage/fraud-ai/README.md)
+1. [README.md](README.md)
+2. [架构.md](docs/架构.md)
+3. [fraud-offline/README.md](fraud-offline/README.md)
+4. [fraud-risk/README.md](fraud-risk/README.md)
+5. [fraud-case/README.md](fraud-case/README.md)

@@ -17,7 +17,9 @@ import me.asu.ta.risk.repository.RiskWeightProfileRepository;
 import me.asu.ta.risk.scoring.BehaviorScoreCalculator;
 import me.asu.ta.risk.scoring.RiskScoreCalculator;
 import me.asu.ta.risk.scoring.RiskWeightProfileService;
+import me.asu.ta.risk.service.GraphRiskSignalResolver;
 import me.asu.ta.risk.service.RiskEvaluationService;
+import me.asu.ta.risk.service.RiskScoreResultFactory;
 import me.asu.ta.rule.model.RuleSeverity;
 import org.h2.jdbcx.JdbcDataSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -60,10 +62,11 @@ public final class RiskTestSupport {
         RiskScoreResultRepository scoreResultRepository = riskScoreResultRepository(dataSource);
         return new RiskEvaluationService(
                 new BehaviorScoreCalculator(),
+                new GraphRiskSignalResolver(),
                 new RiskWeightProfileService(weightProfileRepository),
                 new RiskScoreCalculator(),
-                new RiskLevelClassifier(),
                 new RiskReasonGenerator(reasonMappingRepository),
+                new RiskScoreResultFactory(new RiskLevelClassifier()),
                 scoreResultRepository);
     }
 
@@ -142,8 +145,7 @@ public final class RiskTestSupport {
                 .sharedIpAccounts7d(1)
                 .sharedBankAccounts30d(1)
                 .graphClusterSize30d(2)
-                .riskNeighborCount30d(1)
-                .anomalyScoreLast(0.10d);
+                .riskNeighborCount30d(1);
     }
 
     public static RiskWeightProfile defaultProfile() {

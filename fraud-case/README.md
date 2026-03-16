@@ -50,7 +50,7 @@
 
 ## How Timeline Is Built
 
-时间线由 [CaseTimelineBuilder.java](/d:/03_projects/suk/asu-trading-analysis/fraud-case/src/main/java/me/asu/ta/casemanagement/timeline/CaseTimelineBuilder.java) 生成，目标是“调查导向”，不是原始日志回放。
+时间线由 [CaseTimelineBuilder.java]fraud-case/src/main/java/me/asu/ta/casemanagement/timeline/CaseTimelineBuilder.java) 生成，目标是“调查导向”，不是原始日志回放。
 
 当前优先纳入的事件类型包括：
 
@@ -73,7 +73,7 @@
 
 ## How Recommendations Are Generated
 
-推荐动作由 [CaseRecommendationBuilder.java](/d:/03_projects/suk/asu-trading-analysis/fraud-case/src/main/java/me/asu/ta/casemanagement/recommendation/CaseRecommendationBuilder.java) 生成，逻辑保持显式，不使用隐藏启发式。
+推荐动作由 [CaseRecommendationBuilder.java]fraud-case/src/main/java/me/asu/ta/casemanagement/recommendation/CaseRecommendationBuilder.java) 生成，逻辑保持显式，不使用隐藏启发式。
 
 当前主要依据：
 
@@ -104,7 +104,7 @@
 
 ### Realtime
 
-实时建案入口由 [CaseService.java](/d:/03_projects/suk/asu-trading-analysis/fraud-case/src/main/java/me/asu/ta/casemanagement/service/CaseService.java) 和 [CaseFacade.java](/d:/03_projects/suk/asu-trading-analysis/fraud-case/src/main/java/me/asu/ta/casemanagement/service/CaseFacade.java) 提供。
+实时建案入口由 [CaseService.java]fraud-case/src/main/java/me/asu/ta/casemanagement/service/CaseService.java) 和 [CaseFacade.java]fraud-case/src/main/java/me/asu/ta/casemanagement/service/CaseFacade.java) 提供。
 
 典型流程：
 
@@ -116,7 +116,7 @@
 
 ### Batch
 
-批量建案由 [CaseGenerationJobRunner.java](/d:/03_projects/suk/asu-trading-analysis/fraud-case/src/main/java/me/asu/ta/casemanagement/job/CaseGenerationJobRunner.java) 驱动。
+批量建案由 [CaseGenerationJobRunner.java]fraud-case/src/main/java/me/asu/ta/casemanagement/job/CaseGenerationJobRunner.java) 驱动。
 
 特点：
 
@@ -156,7 +156,7 @@
 模块当前没有单独的 lookup 表。  
 为便于初始化、联调和运营核对，参考 SQL 放在：
 
-- [01_case_reference_data.sql](/d:/03_projects/suk/asu-trading-analysis/fraud-case/sql/01_case_reference_data.sql)
+- [01_case_reference_data.sql]fraud-case/sql/01_case_reference_data.sql)
 
 它提供了当前代码里使用的：
 
