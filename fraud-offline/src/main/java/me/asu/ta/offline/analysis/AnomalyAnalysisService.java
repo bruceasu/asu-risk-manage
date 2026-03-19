@@ -5,7 +5,7 @@ import java.util.List;
 import me.asu.ta.Agg;
 import me.asu.ta.Anomaly;
 import me.asu.ta.BaselineStats;
-import me.asu.ta.ReplayState;
+import me.asu.ta.offline.ReplayState;
 
 import static me.asu.ta.util.CommonUtils.mean;
 import static me.asu.ta.util.CommonUtils.zscore;

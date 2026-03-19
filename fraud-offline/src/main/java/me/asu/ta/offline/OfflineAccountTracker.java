@@ -1,5 +1,11 @@
-package me.asu.ta;
+package me.asu.ta.offline;
 
+import me.asu.ta.ClientFingerprintAnalyzer;
+import me.asu.ta.IntervalStats;
+import me.asu.ta.OrderSizeAnalyzer;
+import me.asu.ta.PriceDeviationTracker;
+import me.asu.ta.TPSLPatternAnalyzer;
+import me.asu.ta.TimeDiffAnalyzer;
 import me.asu.ta.dto.EventText;
 
 import java.math.BigDecimal;

@@ -40,7 +40,7 @@ echo [OK] Compilation successful.
 
 echo.
 echo [2/3] Packaging JAR to bin\app.jar ...
-jar --create --file bin\app.jar --main-class FxReplayPlus -C classes .
+jar --create --file bin\app.jar --main-class me.asu.ta.offline.OfflineReplayCliApplication -C classes .
 if errorlevel 1 (
   echo.
   echo [ERROR] JAR packaging failed.
@@ -104,4 +104,3 @@ echo.
 
 popd
 endlocal
-

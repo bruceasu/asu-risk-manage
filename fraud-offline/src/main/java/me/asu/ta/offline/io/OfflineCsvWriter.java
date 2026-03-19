@@ -3,15 +3,16 @@ package me.asu.ta.offline.io;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+
+import me.asu.ta.offline.OfflineAccountTracker;
 import me.asu.ta.offline.analysis.AccountBehaviorFeatureVector;
 import me.asu.ta.offline.analysis.BehaviorClusterMember;
 import me.asu.ta.offline.analysis.BehaviorSimilarityEdge;
 import me.asu.ta.Agg;
 import me.asu.ta.BaselineStats;
 import me.asu.ta.DetailRow;
-import me.asu.ta.FxReplayWriter;
 import me.asu.ta.LongSamples;
-import me.asu.ta.OfflineAccountTracker;
+
 import com.csvreader.CsvWriter;
 import java.nio.charset.StandardCharsets;
 import me.asu.ta.util.CommonUtils;

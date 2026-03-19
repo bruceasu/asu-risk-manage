@@ -9,8 +9,8 @@ import java.util.Objects;
 import me.asu.ta.Agg;
 import me.asu.ta.DetailRow;
 import me.asu.ta.IntervalStats;
-import me.asu.ta.OfflineAccountTracker;
-import me.asu.ta.ReplayState;
+import me.asu.ta.offline.OfflineAccountTracker;
+import me.asu.ta.offline.ReplayState;
 import me.asu.ta.util.CommonUtils;
 
 public final class BehaviorFeatureAnalysisService {

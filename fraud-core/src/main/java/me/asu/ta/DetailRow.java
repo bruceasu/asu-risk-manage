@@ -1,8 +1,8 @@
 package me.asu.ta;
 
 public class DetailRow {
-    static final long[] DELTAS_MS = {100, 500, 1000, 5000};
-    static final String[] DELTA_NAMES = {"100ms", "500ms", "1s", "5s"};
+    public static final long[] DELTAS_MS = {100, 500, 1000, 5000};
+    public static final String[] DELTA_NAMES = {"100ms", "500ms", "1s", "5s"};
 
     public final String account;
     public final String symbol;

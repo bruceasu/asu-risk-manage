@@ -1,7 +1,5 @@
 package me.asu.ta.offline;
 
-import me.asu.ta.FxReplayCliOptions;
-
 public final class OfflineReplayCliApplication {
     private final OfflineReplayFacade facade;
 

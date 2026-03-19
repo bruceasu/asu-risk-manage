@@ -1,8 +1,8 @@
 package me.asu.ta.offline.analysis;
 
-import me.asu.ta.FxReplayCliOptions;
-import me.asu.ta.FxReplayEngine;
-import me.asu.ta.ReplayState;
+import me.asu.ta.offline.FxReplayCliOptions;
+import me.asu.ta.offline.FxReplayEngine;
+import me.asu.ta.offline.ReplayState;
 
 public final class ReplayAnalysisService {
     public ReplayState replay(FxReplayCliOptions options) throws Exception {

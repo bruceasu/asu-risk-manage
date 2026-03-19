@@ -154,9 +154,9 @@ import java.util.*;
  * @see AccountVec 账户特征向量
  * @see Cluster 聚类簇
  */
-public final class FxReplayClusterer {
+public final class ClusterHelper {
     /** 工具类，不允许实例化。 */
-    private FxReplayClusterer() {}
+    private ClusterHelper() {}
 
     /**
      * 构建账户特征向量并执行聚类，最终将结果写出 CSV 文件。

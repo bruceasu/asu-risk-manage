@@ -14,11 +14,11 @@ public final class OfflineReplayCliSupport {
 
     public static void printHelp() {
         System.out.println("""
-                FxReplayPlus - Offline FX Replay Tool
+                OfflineReplayCliApplication - Offline FX Replay Tool
 
                 Usage:
                   java -jar bin/app.jar --trades <file> --quotes <file> [options]
-                  java -cp classes FxReplayPlus --trades <file> --quotes <file> [options]
+                  java -cp target/classes me.asu.ta.offline.OfflineReplayCliApplication --trades <file> --quotes <file> [options]
 
                 Required:
                   --trades <file>              trades CSV

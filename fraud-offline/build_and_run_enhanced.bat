@@ -37,14 +37,14 @@ echo ========================================
 echo 步骤4: 运行基础示例（使用原始数据）
 echo ========================================
 echo 注意：原始trades.csv不包含bot检测字段，bot指标列将为空
-java -cp classes FxReplayPlus --trades examples\trades.csv --quotes examples\quotes.csv --agg-account true
+java -cp classes me.asu.ta.offline.OfflineReplayCliApplication --trades examples\trades.csv --quotes examples\quotes.csv --agg-account true
 echo.
 
 echo ========================================
 echo 步骤5: 运行增强示例（使用新数据格式）
 echo ========================================
 echo 注意：trades_enhanced.csv包含完整的bot检测字段
-java -cp classes FxReplayPlus --trades examples\trades_enhanced.csv --quotes examples\quotes.csv --agg-account true --min-trades 0
+java -cp classes me.asu.ta.offline.OfflineReplayCliApplication --trades examples\trades_enhanced.csv --quotes examples\quotes.csv --agg-account true --min-trades 0
 echo.
 
 echo ========================================

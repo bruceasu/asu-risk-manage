@@ -1,8 +1,8 @@
 package me.asu.ta.offline.analysis;
 
 import me.asu.ta.BaselineStats;
-import me.asu.ta.FxReplayCliOptions;
-import me.asu.ta.ReplayState;
+import me.asu.ta.offline.FxReplayCliOptions;
+import me.asu.ta.offline.ReplayState;
 
 public final class BaselineAnalysisService {
     public BaselineStats computeBaseline(ReplayState state, FxReplayCliOptions options) {

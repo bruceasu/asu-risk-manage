@@ -1,9 +1,12 @@
-package me.asu.ta;
+package me.asu.ta.offline;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Data;
+import lombok.Getter;
 
 import static me.asu.ta.util.CommonUtils.intv;
 import static me.asu.ta.util.CommonUtils.parseArgs;
@@ -11,6 +14,7 @@ import static me.asu.ta.util.CommonUtils.parseDouble;
 import static me.asu.ta.util.CommonUtils.parseInt;
 import static me.asu.ta.util.CommonUtils.require;
 
+@Getter
 public final class FxReplayCliOptions {
     private final Path tradesPath;
     private final Path quotesPath;
@@ -170,87 +174,4 @@ public final class FxReplayCliOptions {
         return Paths.get(defaultFileName);
     }
 
-    public Path getTradesPath() {
-        return tradesPath;
-    }
-
-    public Path getQuotesPath() {
-        return quotesPath;
-    }
-
-    public ReplayOptions getReplay() {
-        return replay;
-    }
-
-    public OutputOptions getOutputs() {
-        return outputs;
-    }
-
-    public boolean isAggAccount() {
-        return aggAccount;
-    }
-
-    public boolean isCluster() {
-        return cluster;
-    }
-
-    public int getClusterK() {
-        return clusterK;
-    }
-
-    public double getClusterThreshold() {
-        return clusterThreshold;
-    }
-
-    public boolean isBaseline() {
-        return baseline;
-    }
-
-    public boolean isReport() {
-        return report;
-    }
-
-    public int getTopN() {
-        return topN;
-    }
-
-    public int getMinTrades() {
-        return minTrades;
-    }
-
-    public boolean isCharts() {
-        return charts;
-    }
-
-    public int getChartTopN() {
-        return chartTopN;
-    }
-
-    public boolean isIntegrateCurrentSystem() {
-        return integrateCurrentSystem;
-    }
-
-    public boolean isBehaviorCluster() {
-        return behaviorCluster;
-    }
-
-    public int getBehaviorClusterK() {
-        return behaviorClusterK;
-    }
-
-    public double getBehaviorClusterThreshold() {
-        return behaviorClusterThreshold;
-    }
-
-    public boolean isSimilarityEdges() {
-        return similarityEdges;
-    }
-
-    public double getSimilarityThreshold() {
-        return similarityThreshold;
-    }
-
-    public int getTopSimilarPerAccount() {
-        return topSimilarPerAccount;
-    }
 }

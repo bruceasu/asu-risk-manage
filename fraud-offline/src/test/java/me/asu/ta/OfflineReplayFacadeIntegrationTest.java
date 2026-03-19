@@ -2,12 +2,13 @@ package me.asu.ta;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import me.asu.ta.offline.OfflineReplayCliApplication;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class OfflineReplayFacadeIntegrationTest {
     @Test
-    public void legacyEntryPointShouldDelegateToNewFacadeAndProduceOutputs() throws Exception {
+    public void unifiedEntryPointShouldProduceConfiguredOutputs() throws Exception {
         Path tempDir = Files.createTempDirectory("offline-facade");
         Path outputDir = tempDir.resolve("out");
         Files.createDirectories(outputDir);
@@ -32,7 +33,7 @@ public class OfflineReplayFacadeIntegrationTest {
                 A2,EURUSD,SELL,2100,1.0,1.0,,,
                 """);
 
-        FxReplayPlus.main(new String[] {
+        OfflineReplayCliApplication.main(new String[] {
                 "--trades", trades.toString(),
                 "--quotes", quotes.toString(),
                 "--out-dir", outputDir.toString(),

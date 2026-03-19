@@ -4,9 +4,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import me.asu.ta.Agg;
-import me.asu.ta.OfflineAccountTracker;
-import me.asu.ta.ReplayState;
 import me.asu.ta.feature.model.AccountFeatureSnapshot;
+import me.asu.ta.offline.OfflineAccountTracker;
+import me.asu.ta.offline.ReplayState;
+
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,6 +1,14 @@
-package me.asu.ta;
+package me.asu.ta.offline.io;
 
 import com.csvreader.CsvWriter;
+
+import me.asu.ta.Agg;
+import me.asu.ta.Anomaly;
+import me.asu.ta.BaselineStats;
+import me.asu.ta.DetailRow;
+import me.asu.ta.IntervalStats;
+import me.asu.ta.LongSamples;
+import me.asu.ta.offline.OfflineAccountTracker;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

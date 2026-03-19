@@ -1,4 +1,4 @@
-package me.asu.ta;
+package me.asu.ta.offline;
 
 import com.csvreader.CsvReader;
 import java.io.IOException;
@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import me.asu.ta.Agg;
+import me.asu.ta.DetailRow;
+import me.asu.ta.LongSamples;
+import me.asu.ta.QuoteSeries;
+import me.asu.ta.Side;
 import me.asu.ta.dto.EventText;
 import me.asu.ta.dto.QuoteEvent;
 

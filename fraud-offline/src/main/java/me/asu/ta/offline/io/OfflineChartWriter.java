@@ -1,7 +1,7 @@
 package me.asu.ta.offline.io;
 
-import me.asu.ta.FxReplayCliOptions;
-import me.asu.ta.ReplayState;
+import me.asu.ta.offline.FxReplayCliOptions;
+import me.asu.ta.offline.ReplayState;
 
 public final class OfflineChartWriter {
     public void writeDashboard(FxReplayCliOptions options, ReplayState state) throws Exception {

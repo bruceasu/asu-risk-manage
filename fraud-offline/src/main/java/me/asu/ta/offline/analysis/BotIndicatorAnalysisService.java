@@ -2,8 +2,8 @@ package me.asu.ta.offline.analysis;
 
 import me.asu.ta.DetailRow;
 import me.asu.ta.IntervalStats;
-import me.asu.ta.OfflineAccountTracker;
-import me.asu.ta.ReplayState;
+import me.asu.ta.offline.OfflineAccountTracker;
+import me.asu.ta.offline.ReplayState;
 
 public final class BotIndicatorAnalysisService {
     public void enrichDetailRows(ReplayState state) {

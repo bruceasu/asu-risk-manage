@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import me.asu.ta.Anomaly;
 import me.asu.ta.BaselineStats;
-import me.asu.ta.ReplayState;
+import me.asu.ta.offline.ReplayState;
 
 public record OfflineAnalysisBundle(
         ReplayState replayState,

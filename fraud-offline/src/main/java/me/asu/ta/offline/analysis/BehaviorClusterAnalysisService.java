@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import me.asu.ta.AccountVec;
 import me.asu.ta.Cluster;
-import me.asu.ta.FxReplayClusterer;
+import me.asu.ta.ClusterHelper;
 
 public final class BehaviorClusterAnalysisService {
     public List<BehaviorClusterMember> cluster(
@@ -21,8 +21,8 @@ public final class BehaviorClusterAnalysisService {
                 .map(feature -> new AccountVec(feature.getAccountId(), feature.getNormalizedVector()))
                 .toList();
         List<Cluster> clusters = k > 0
-                ? FxReplayClusterer.kMeans(vectors, k, 30)
-                : FxReplayClusterer.thresholdClustering(vectors, threshold);
+                ? ClusterHelper.kMeans(vectors, k, 30)
+                : ClusterHelper.thresholdClustering(vectors, threshold);
         Map<String, Double> norms = new LinkedHashMap<>();
         for (AccountBehaviorFeatureVector feature : features.values()) {
             norms.put(feature.getAccountId(), feature.getRawVectorNorm());

@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Map;
 import me.asu.ta.Anomaly;
 import me.asu.ta.BaselineStats;
-import me.asu.ta.FxReplayCliOptions;
-import me.asu.ta.OutputOptions;
-import me.asu.ta.ReplayState;
 import me.asu.ta.offline.analysis.AnomalyAnalysisService;
 import me.asu.ta.offline.analysis.AccountBehaviorFeatureVector;
 import me.asu.ta.offline.analysis.AccountSimilarityAnalysisService;
@@ -132,20 +129,20 @@ public final class OfflineReplayFacade {
         System.out.println("Agg account keys: " + state.getAggByAccount().size());
     }
 
-    public void executeClusterOnly(FxReplayCliOptions options) throws Exception {
-        ReplayState state = replayAnalysisService.replay(options);
-        clusterAnalysisService.writeClusters(options, state);
-    }
+    // public void executeClusterOnly(FxReplayCliOptions options) throws Exception {
+    //     ReplayState state = replayAnalysisService.replay(options);
+    //     clusterAnalysisService.writeClusters(options, state);
+    // }
 
-    public void executeReportOnly(FxReplayCliOptions options) throws Exception {
-        ReplayState state = replayAnalysisService.replay(options);
-        BaselineStats baselineStats = baselineAnalysisService.computeBaseline(state, options);
-        if (baselineStats == null) {
-            return;
-        }
-        List<Anomaly> anomalies = anomalyAnalysisService.computeAnomalies(state, baselineStats, options.getMinTrades());
-        reportWriter.writeRiskReport(options.getOutputs().getReport(), anomalies, options.getTopN(), baselineStats);
-    }
+    // public void executeReportOnly(FxReplayCliOptions options) throws Exception {
+    //     ReplayState state = replayAnalysisService.replay(options);
+    //     BaselineStats baselineStats = baselineAnalysisService.computeBaseline(state, options);
+    //     if (baselineStats == null) {
+    //         return;
+    //     }
+    //     List<Anomaly> anomalies = anomalyAnalysisService.computeAnomalies(state, baselineStats, options.getMinTrades());
+    //     reportWriter.writeRiskReport(options.getOutputs().getReport(), anomalies, options.getTopN(), baselineStats);
+    // }
 
     private void writeReplayOutputs(FxReplayCliOptions options, ReplayState state) throws Exception {
         OutputOptions outputs = options.getOutputs();

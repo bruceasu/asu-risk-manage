@@ -391,7 +391,7 @@ source ~/.bashrc
 **解决**:
 ```bash
 # 增加堆内存
-java -Xmx8G -cp classes FxReplayPlus ...
+java -Xmx8G -cp target/classes me.asu.ta.offline.OfflineReplayCliApplication ...
 
 # 或修改脚本中的JAVA_OPTS
 JAVA_OPTS="-Xmx8G -XX:+UseG1GC -XX:MaxGCPauseMillis=200"

@@ -160,7 +160,7 @@ mvn -pl fraud-online -am spring-boot:run
 ### 运行离线 replay
 
 ```bash
-java -cp fraud-offline/target/classes me.asu.ta.FxReplayPlus ^
+java -cp fraud-offline/target/classes me.asu.ta.offline.OfflineReplayCliApplication ^
   --trades data/trades.csv ^
   --quotes data/quotes.csv ^
   --out-dir out ^

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import me.asu.ta.Anomaly;
 import me.asu.ta.BaselineStats;
-import me.asu.ta.FxReplayWriter;
 import me.asu.ta.offline.analysis.BehaviorClusterMember;
 import me.asu.ta.offline.analysis.BehaviorSimilarityEdge;
 import me.asu.ta.risk.model.RiskScoreResult;

@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import me.asu.ta.AccountVec;
 import me.asu.ta.Cluster;
-import me.asu.ta.FxReplayCliOptions;
-import me.asu.ta.FxReplayClusterer;
-import me.asu.ta.ReplayState;
+import me.asu.ta.ClusterHelper;
+import me.asu.ta.offline.FxReplayCliOptions;
+import me.asu.ta.offline.ReplayState;
 
 public final class ClusterAnalysisService {
     public void writeClusters(FxReplayCliOptions options, ReplayState state) throws Exception {
-        FxReplayClusterer.clusterAccountsAndWrite(
+        ClusterHelper.clusterAccountsAndWrite(
                 options.getOutputs().getCluster(),
                 state.getAggByAccount(),
                 options.getClusterK(),
@@ -26,8 +26,8 @@ public final class ClusterAnalysisService {
                 .filter(java.util.Objects::nonNull)
                 .toList();
         List<Cluster> clusters = options.getClusterK() > 0
-                ? FxReplayClusterer.kMeans(vecs, options.getClusterK(), 30)
-                : FxReplayClusterer.thresholdClustering(vecs, options.getClusterThreshold());
+                ? ClusterHelper.kMeans(vecs, options.getClusterK(), 30)
+                : ClusterHelper.thresholdClustering(vecs, options.getClusterThreshold());
         Map<String, Integer> clusterSizes = new LinkedHashMap<>();
         for (Cluster cluster : clusters) {
             int size = cluster.members.size();

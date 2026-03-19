@@ -11,8 +11,8 @@
 
 当前实现已经从单一入口程序拆成了分层结构：
 
-- `me.asu.ta.FxReplayPlus`
-  - 兼容旧入口，内部委派到新的 CLI 编排层。
+- `me.asu.ta.offline.OfflineReplayCliApplication`
+  - 离线分析统一 CLI 入口。
 - `me.asu.ta.offline`
   - CLI 与总编排。
 - `me.asu.ta.offline.analysis`
@@ -100,7 +100,7 @@ symbol,quote_time_ms,bid,ask
 ### 基础运行
 
 ```bash
-java -cp target/classes me.asu.ta.FxReplayPlus \
+java -cp target/classes me.asu.ta.offline.OfflineReplayCliApplication \
   --trades trades.csv \
   --quotes quotes.csv
 ```
@@ -108,7 +108,7 @@ java -cp target/classes me.asu.ta.FxReplayPlus \
 ### 完整文件分析
 
 ```bash
-java -cp target/classes me.asu.ta.FxReplayPlus \
+java -cp target/classes me.asu.ta.offline.OfflineReplayCliApplication \
   --trades trades.csv \
   --quotes quotes.csv \
   --out-dir out \
@@ -124,7 +124,7 @@ java -cp target/classes me.asu.ta.FxReplayPlus \
 ### 集成到当前体系
 
 ```bash
-java -cp target/classes me.asu.ta.FxReplayPlus \
+java -cp target/classes me.asu.ta.offline.OfflineReplayCliApplication \
   --trades trades.csv \
   --quotes quotes.csv \
   --out-dir out \

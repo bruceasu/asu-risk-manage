@@ -156,7 +156,7 @@ fi
 log "运行离线分析..."
 cd "${OFFLINE_DIR}"
 
-${JAVA_HOME}/bin/java ${JAVA_OPTS} -cp classes FxReplayPlus \
+${JAVA_HOME}/bin/java ${JAVA_OPTS} -cp classes me.asu.ta.offline.OfflineReplayCliApplication \
     --trades "${TRADES_FILE}" \
     --quotes "${QUOTES_FILE}" \
     --out-detail "${REPORT_DIR}/${REPORT_PREFIX}_detail.csv" \

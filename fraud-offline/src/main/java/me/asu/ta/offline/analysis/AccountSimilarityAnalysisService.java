@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import me.asu.ta.FxReplayClusterer;
+import me.asu.ta.ClusterHelper;
 
 public final class AccountSimilarityAnalysisService {
     public List<BehaviorSimilarityEdge> analyze(
@@ -22,7 +22,7 @@ public final class AccountSimilarityAnalysisService {
             for (int j = i + 1; j < vectors.size(); j++) {
                 AccountBehaviorFeatureVector left = vectors.get(i);
                 AccountBehaviorFeatureVector right = vectors.get(j);
-                double similarity = FxReplayClusterer.cosine(left.getNormalizedVector(), right.getNormalizedVector());
+                double similarity = ClusterHelper.cosine(left.getNormalizedVector(), right.getNormalizedVector());
                 if (similarity < threshold) {
                     continue;
                 }
