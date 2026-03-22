@@ -2,13 +2,15 @@ package me.asu.ta;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import me.asu.ta.offline.analysis.ReplayAnalysisService;
+import me.asu.ta.offline.ReplayEngine;
+import me.asu.ta.offline.ReplayCliOptions;
+import me.asu.ta.offline.ReplayState;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ReplayAnalysisServiceTest {
+public class ReplayEngineTest {
     @Test
-    public void replayShouldAggregateValidTradesAndSkipInvalidRows() throws Exception {
+    public void replayShouldKeepTradesWithoutQuotesForNonQuoteSignals() throws Exception {
         Path tempDir = Files.createTempDirectory("offline-replay-analysis");
         Path quotes = tempDir.resolve("quotes.csv");
         Path trades = tempDir.resolve("trades.csv");
@@ -30,19 +32,28 @@ public class ReplayAnalysisServiceTest {
                 A2,GBPUSD,BUY,1500,1.0,1.0,,,
                 """);
 
-        FxReplayCliOptions options = FxReplayCliOptions.fromArgs(new String[] {
+        ReplayCliOptions options = ReplayCliOptions.fromArgs(new String[] {
                 "--trades", trades.toString(),
                 "--quotes", quotes.toString(),
                 "--quoteage-stats",
                 "--time-bucket-min", "1"
         });
 
-        ReplayState state = new ReplayAnalysisService().replay(options);
+        ReplayState state = ReplayEngine.replay(options.getTradesPath(), options.getQuotesPath(), options.getReplay());
 
-        Assert.assertEquals(2, state.getDetailRows().size());
+        Assert.assertEquals(3, state.getDetailRows().size());
         Assert.assertEquals(1, state.getAggByAccount().size());
         Assert.assertEquals(1, state.getAggByAccountSymbol().size());
+        Assert.assertEquals(2, state.getAccountTrackers().size());
         Assert.assertFalse(state.getBuckets().isEmpty());
         Assert.assertFalse(state.getQuoteAgeSamples().isEmpty());
+        DetailRow missingQuoteRow = state.getDetailRows().stream()
+                .filter(row -> "GBPUSD".equals(row.symbol))
+                .findFirst()
+                .orElseThrow();
+        Assert.assertTrue(Double.isNaN(missingQuoteRow.mid0));
+        Assert.assertEquals(-1L, missingQuoteRow.lastQuoteT0);
+        Assert.assertEquals(-1L, missingQuoteRow.quoteAgeMs);
+        Assert.assertNull(missingQuoteRow.marks[0]);
     }
 }

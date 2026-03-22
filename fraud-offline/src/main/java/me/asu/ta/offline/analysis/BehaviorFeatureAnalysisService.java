@@ -2,6 +2,7 @@ package me.asu.ta.offline.analysis;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,18 +22,21 @@ public final class BehaviorFeatureAnalysisService {
         }
 
         Map<String, AccountBehaviorFeatureVector> result = new LinkedHashMap<>();
-        state.getAggByAccount().entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .forEach(entry -> {
-                    String accountId = entry.getKey();
-                    Agg agg = entry.getValue();
-                    if (agg.n < minTrades) {
+        LinkedHashSet<String> accountIds = new LinkedHashSet<>();
+        accountIds.addAll(detailsByAccount.keySet());
+        accountIds.addAll(state.getAccountTrackers().keySet());
+        accountIds.stream()
+                .sorted()
+                .forEach(accountId -> {
+                    List<DetailRow> rows = detailsByAccount.getOrDefault(accountId, List.of());
+                    if (rows.size() < minTrades) {
                         return;
                     }
+                    Agg agg = state.getAggByAccount().get(accountId);
                     AccountBehaviorFeatureVector vector = toVector(
                             accountId,
                             agg,
-                            detailsByAccount.getOrDefault(accountId, List.of()),
+                            rows,
                             state.getAccountTrackers().get(accountId));
                     if (vector != null) {
                         result.put(accountId, vector);
@@ -46,12 +50,12 @@ public final class BehaviorFeatureAnalysisService {
             Agg agg,
             List<DetailRow> rows,
             OfflineAccountTracker tracker) {
-        if (agg == null || agg.n <= 0) {
+        if (rows.isEmpty()) {
             return null;
         }
         QuoteAgeStats quoteAgeStats = computeQuoteAgeStats(rows);
         IntervalStats intervalStats = tracker != null ? tracker.computeStats() : null;
-        double avgSize = rows.stream().mapToDouble(row -> row.size).filter(value -> value > 0).average().orElse(0.0);
+        double avgSize = rows.stream().mapToDouble(row -> row.volume).filter(value -> value > 0).average().orElse(0.0);
         double sizeStdLike = computeSizeStdLike(rows, avgSize);
         double buySellImbalance = computeBuySellImbalance(rows);
         double markout500Mean = rows.stream()
@@ -72,10 +76,12 @@ public final class BehaviorFeatureAnalysisService {
         double tpslRatio = tracker != null ? tracker.getTPSLRatio() : 0.0;
         int clientIpCount = tracker != null ? tracker.getClientIPCount() : 0;
         int clientTypeCount = countClientTypes(tracker != null ? tracker.getClientTypes() : "");
+        int symbolCount = (int) rows.stream().map(row -> row.symbol).filter(Objects::nonNull).distinct().count();
+        long tradeCount = rows.size();
 
         double[] raw = new double[] {
-                scale(agg.n, 50.0),
-                scale(agg.symbols.size(), 10.0),
+                scale(tradeCount, 50.0),
+                scale(symbolCount, 10.0),
                 scale(avgHoldingTimeProxy, 1_000.0),
                 scale(quoteAgeStats.mean(), 100.0),
                 scale(quoteAgeStats.p50(), 100.0),
@@ -101,8 +107,8 @@ public final class BehaviorFeatureAnalysisService {
         }
         return new AccountBehaviorFeatureVector(
                 accountId,
-                agg.n,
-                agg.symbols.size(),
+                tradeCount,
+                symbolCount,
                 avgHoldingTimeProxy,
                 quoteAgeStats.mean(),
                 quoteAgeStats.p50(),
@@ -128,10 +134,10 @@ public final class BehaviorFeatureAnalysisService {
         double sumSq = 0.0;
         int count = 0;
         for (DetailRow row : rows) {
-            if (row.size <= 0) {
+            if (row.volume <= 0) {
                 continue;
             }
-            double diff = row.size - avgSize;
+            double diff = row.volume - avgSize;
             sumSq += diff * diff;
             count++;
         }
@@ -163,13 +169,14 @@ public final class BehaviorFeatureAnalysisService {
     }
 
     private QuoteAgeStats computeQuoteAgeStats(List<DetailRow> rows) {
-        if (rows.isEmpty()) {
-            return new QuoteAgeStats(0.0, 0.0, 0.0);
-        }
         List<Long> ages = rows.stream()
                 .map(row -> row.quoteAgeMs)
+                .filter(age -> age >= 0)
                 .sorted(Comparator.naturalOrder())
                 .toList();
+        if (ages.isEmpty()) {
+            return new QuoteAgeStats(0.0, 0.0, 0.0);
+        }
         double mean = ages.stream().mapToLong(Long::longValue).average().orElse(0.0);
         long[] sorted = new long[ages.size()];
         for (int i = 0; i < ages.size(); i++) {

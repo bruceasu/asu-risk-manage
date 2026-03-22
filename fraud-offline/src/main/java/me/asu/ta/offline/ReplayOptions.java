@@ -30,23 +30,10 @@ public final class ReplayOptions {
         return normalized.isEmpty() ? fallback : normalized;
     }
 
-    public int getBucketMin() {
-        return bucketMin;
-    }
+    public int getBucketMin() { return bucketMin; }
+    public String getBucketBy() { return bucketBy; }
+    public boolean isQuoteAgeStats() { return quoteAgeStats; }
+    public String getQuoteAgeScope() { return quoteAgeScope; }
+    public int getQuoteAgeMaxSamplesPerKey() { return quoteAgeMaxSamplesPerKey; }
 
-    public String getBucketBy() {
-        return bucketBy;
-    }
-
-    public boolean isQuoteAgeStats() {
-        return quoteAgeStats;
-    }
-
-    public String getQuoteAgeScope() {
-        return quoteAgeScope;
-    }
-
-    public int getQuoteAgeMaxSamplesPerKey() {
-        return quoteAgeMaxSamplesPerKey;
-    }
 }

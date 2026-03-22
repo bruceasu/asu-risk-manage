@@ -6,11 +6,11 @@ import java.util.Map;
 import me.asu.ta.AccountVec;
 import me.asu.ta.Cluster;
 import me.asu.ta.ClusterHelper;
-import me.asu.ta.offline.FxReplayCliOptions;
+import me.asu.ta.offline.ReplayCliOptions;
 import me.asu.ta.offline.ReplayState;
 
 public final class ClusterAnalysisService {
-    public void writeClusters(FxReplayCliOptions options, ReplayState state) throws Exception {
+    public void writeClusters(ReplayCliOptions options, ReplayState state) throws Exception {
         ClusterHelper.clusterAccountsAndWrite(
                 options.getOutputs().getCluster(),
                 state.getAggByAccount(),
@@ -19,7 +19,7 @@ public final class ClusterAnalysisService {
                 options.getMinTrades());
     }
 
-    public Map<String, Integer> computeClusterSizes(FxReplayCliOptions options, ReplayState state) {
+    public Map<String, Integer> computeClusterSizes(ReplayCliOptions options, ReplayState state) {
         List<AccountVec> vecs = state.getAggByAccount().entrySet().stream()
                 .filter(entry -> entry.getValue().n >= options.getMinTrades())
                 .map(entry -> AccountVec.from(entry.getKey(), entry.getValue()))

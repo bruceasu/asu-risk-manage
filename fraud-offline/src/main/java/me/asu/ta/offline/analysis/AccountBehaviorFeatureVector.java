@@ -64,79 +64,27 @@ public final class AccountBehaviorFeatureVector {
         this.rawVectorNorm = rawVectorNorm;
     }
 
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public long getTradeCount() {
-        return tradeCount;
-    }
-
-    public int getSymbolCount() {
-        return symbolCount;
-    }
-
-    public double getAvgHoldingTimeProxy() {
-        return avgHoldingTimeProxy;
-    }
-
-    public double getQuoteAgeMean() {
-        return quoteAgeMean;
-    }
-
-    public double getQuoteAgeP50() {
-        return quoteAgeP50;
-    }
-
-    public double getQuoteAgeP90() {
-        return quoteAgeP90;
-    }
-
-    public double getInterArrivalCv() {
-        return interArrivalCv;
-    }
-
-    public double getEntropy() {
-        return entropy;
-    }
-
-    public double getTpslRatio() {
-        return tpslRatio;
-    }
-
-    public int getClientIpCount() {
-        return clientIpCount;
-    }
-
-    public int getClientTypeCount() {
-        return clientTypeCount;
-    }
-
-    public double getAvgSize() {
-        return avgSize;
-    }
-
-    public double getSizeStdLike() {
-        return sizeStdLike;
-    }
-
-    public double getBuySellImbalance() {
-        return buySellImbalance;
-    }
-
-    public double getMarkout500Mean() {
-        return markout500Mean;
-    }
-
-    public double getMarkout1sMean() {
-        return markout1sMean;
-    }
-
     public double[] getNormalizedVector() {
         return Arrays.copyOf(normalizedVector, normalizedVector.length);
     }
 
-    public double getRawVectorNorm() {
-        return rawVectorNorm;
-    }
+    public String getAccountId() { return accountId; }
+    public long getTradeCount() { return tradeCount; }
+    public int getSymbolCount() { return symbolCount; }
+    public double getAvgHoldingTimeProxy() { return avgHoldingTimeProxy; }
+    public double getQuoteAgeMean() { return quoteAgeMean; }
+    public double getQuoteAgeP50() { return quoteAgeP50; }
+    public double getQuoteAgeP90() { return quoteAgeP90; }
+    public double getInterArrivalCv() { return interArrivalCv; }
+    public double getEntropy() { return entropy; }
+    public double getTpslRatio() { return tpslRatio; }
+    public int getClientIpCount() { return clientIpCount; }
+    public int getClientTypeCount() { return clientTypeCount; }
+    public double getAvgSize() { return avgSize; }
+    public double getSizeStdLike() { return sizeStdLike; }
+    public double getBuySellImbalance() { return buySellImbalance; }
+    public double getMarkout500Mean() { return markout500Mean; }
+    public double getMarkout1sMean() { return markout1sMean; }
+    public double getRawVectorNorm() { return rawVectorNorm; }
+
 }

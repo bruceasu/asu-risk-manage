@@ -52,30 +52,25 @@ public class Agg {
         if (m100 != null) {
             sumMark100 += m100;
             sumSqMark100 += m100 * m100;
-            if (m100 > 0)
-                pos100++;
+            if (m100 > 0) pos100++;
         }
         if (m500 != null) {
             sumMark500 += m500;
             sumSqMark500 += m500 * m500;
-            if (m500 > 0)
-                pos500++;
+            if (m500 > 0) pos500++;
         }
         if (m1s != null) {
             sumMark1s += m1s;
             sumSqMark1s += m1s * m1s;
-            if (m1s > 0)
-                pos1s++;
+            if (m1s > 0) pos1s++;
         }
         if (m5s != null) {
             sumMark5s += m5s;
             sumSqMark5s += m1s * m5s;
-            if (m5s > 0)
-                pos5s++;
+            if (m5s > 0) pos5s++;
         }
         minT = Math.min(minT, execTimeMs);
         maxT = Math.max(maxT, execTimeMs);
-        if (symbol != null && !symbol.isBlank())
-            symbols.add(symbol);
+        if (symbol != null && !symbol.isBlank()) symbols.add(symbol);
     }
 }

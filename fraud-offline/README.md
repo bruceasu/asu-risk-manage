@@ -24,7 +24,7 @@
 
 核心类职责：
 
-- `FxReplayEngine`
+- `ReplayEngine`
   - 读取 trades/quotes，完成历史回放和账户聚合。
 - `OfflineReplayFacade`
   - 统一调度 replay、输出、可选集成。
@@ -240,7 +240,7 @@ mvn -pl fraud-offline -am compile
 - 模块编译验证
   - `mvn -pl fraud-offline -am compile`
 - 定向离线测试
-  - `ReplayAnalysisServiceTest`
+  - `ReplayEngineTest`
   - `BotIndicatorAnalysisServiceTest`
   - `FxReplayClustererTest`
   - `OfflineReplayFacadeIntegrationTest`

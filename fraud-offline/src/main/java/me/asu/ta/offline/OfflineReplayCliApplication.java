@@ -20,6 +20,6 @@ public final class OfflineReplayCliApplication {
             OfflineReplayCliSupport.printHelp();
             return;
         }
-        facade.execute(FxReplayCliOptions.fromArgs(args));
+        facade.execute(ReplayCliOptions.fromArgs(args));
     }
 }

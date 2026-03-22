@@ -17,10 +17,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <resource>META-INF/services/me.asu.tui.framework.api.CliPlugin</resource>
-                </transformer>
-                <transformer>
-                  <resource>META-INF/services/me.asu.tui.framework.api.CliCommand</resource>
+                  <mainClass>me.asu.ta.offline.OfflineReplayCliApplication</mainClass>
                 </transformer>
               </transformers>
             </configuration>

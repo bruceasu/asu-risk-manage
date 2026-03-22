@@ -14,7 +14,6 @@ import me.asu.ta.offline.analysis.BehaviorFeatureAnalysisService;
 import me.asu.ta.offline.analysis.BehaviorSimilarityEdge;
 import me.asu.ta.offline.analysis.BotIndicatorAnalysisService;
 import me.asu.ta.offline.analysis.ClusterAnalysisService;
-import me.asu.ta.offline.analysis.ReplayAnalysisService;
 import me.asu.ta.offline.integration.OfflineAnalysisBundle;
 import me.asu.ta.offline.integration.OfflineBatchIntegrationResult;
 import me.asu.ta.offline.integration.OfflineRiskBatchService;
@@ -25,7 +24,6 @@ import me.asu.ta.offline.io.OfflineReportWriter;
 import org.springframework.context.ConfigurableApplicationContext;
 
 public final class OfflineReplayFacade {
-    private final ReplayAnalysisService replayAnalysisService;
     private final BaselineAnalysisService baselineAnalysisService;
     private final BotIndicatorAnalysisService botIndicatorAnalysisService;
     private final AnomalyAnalysisService anomalyAnalysisService;
@@ -39,7 +37,6 @@ public final class OfflineReplayFacade {
 
     public OfflineReplayFacade() {
         this(
-                new ReplayAnalysisService(),
                 new BaselineAnalysisService(),
                 new BotIndicatorAnalysisService(),
                 new AnomalyAnalysisService(),
@@ -53,7 +50,6 @@ public final class OfflineReplayFacade {
     }
 
     OfflineReplayFacade(
-            ReplayAnalysisService replayAnalysisService,
             BaselineAnalysisService baselineAnalysisService,
             BotIndicatorAnalysisService botIndicatorAnalysisService,
             AnomalyAnalysisService anomalyAnalysisService,
@@ -64,7 +60,6 @@ public final class OfflineReplayFacade {
             OfflineCsvWriter csvWriter,
             OfflineReportWriter reportWriter,
             OfflineChartWriter chartWriter) {
-        this.replayAnalysisService = replayAnalysisService;
         this.baselineAnalysisService = baselineAnalysisService;
         this.botIndicatorAnalysisService = botIndicatorAnalysisService;
         this.anomalyAnalysisService = anomalyAnalysisService;
@@ -77,9 +72,10 @@ public final class OfflineReplayFacade {
         this.chartWriter = chartWriter;
     }
 
-    public void execute(FxReplayCliOptions options) throws Exception {
+    public void execute(ReplayCliOptions options) throws Exception {
         System.out.println("Replaying trades: " + options.getTradesPath());
-        ReplayState state = replayAnalysisService.replay(options);
+        ReplayState state = ReplayEngine.replay(options.getTradesPath(), options.getQuotesPath(), options.getReplay());
+        
         BaselineStats baselineStats = baselineAnalysisService.computeBaseline(state, options);
         List<Anomaly> anomalies = baselineStats == null
                 ? List.of()
@@ -129,22 +125,7 @@ public final class OfflineReplayFacade {
         System.out.println("Agg account keys: " + state.getAggByAccount().size());
     }
 
-    // public void executeClusterOnly(FxReplayCliOptions options) throws Exception {
-    //     ReplayState state = replayAnalysisService.replay(options);
-    //     clusterAnalysisService.writeClusters(options, state);
-    // }
-
-    // public void executeReportOnly(FxReplayCliOptions options) throws Exception {
-    //     ReplayState state = replayAnalysisService.replay(options);
-    //     BaselineStats baselineStats = baselineAnalysisService.computeBaseline(state, options);
-    //     if (baselineStats == null) {
-    //         return;
-    //     }
-    //     List<Anomaly> anomalies = anomalyAnalysisService.computeAnomalies(state, baselineStats, options.getMinTrades());
-    //     reportWriter.writeRiskReport(options.getOutputs().getReport(), anomalies, options.getTopN(), baselineStats);
-    // }
-
-    private void writeReplayOutputs(FxReplayCliOptions options, ReplayState state) throws Exception {
+    private void writeReplayOutputs(ReplayCliOptions options, ReplayState state) throws Exception {
         OutputOptions outputs = options.getOutputs();
         System.out.println("Writing detail: " + outputs.getDetail());
         csvWriter.writeDetail(outputs.getDetail(), state.getDetailRows());
@@ -167,7 +148,7 @@ public final class OfflineReplayFacade {
     }
 
     private OfflineBatchIntegrationResult integrateWithCurrentSystemIfEnabled(
-            FxReplayCliOptions options,
+            ReplayCliOptions options,
             OfflineAnalysisBundle bundle) {
         if (!options.isIntegrateCurrentSystem()) {
             return null;
@@ -182,7 +163,7 @@ public final class OfflineReplayFacade {
         }
     }
 
-    private BehaviorOutputs analyzeBehaviorIfEnabled(FxReplayCliOptions options, ReplayState state) {
+    private BehaviorOutputs analyzeBehaviorIfEnabled(ReplayCliOptions options, ReplayState state) {
         if (!options.isBehaviorCluster() && !options.isSimilarityEdges()) {
             return BehaviorOutputs.empty();
         }
@@ -203,7 +184,7 @@ public final class OfflineReplayFacade {
         return new BehaviorOutputs(features, clusters, edges);
     }
 
-    private void writeBehaviorOutputsIfEnabled(FxReplayCliOptions options, BehaviorOutputs behaviorOutputs) throws Exception {
+    private void writeBehaviorOutputsIfEnabled(ReplayCliOptions options, BehaviorOutputs behaviorOutputs) throws Exception {
         if (behaviorOutputs.isEmpty()) {
             return;
         }

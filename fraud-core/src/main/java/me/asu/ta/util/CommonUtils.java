@@ -1,11 +1,9 @@
 package me.asu.ta.util;
 
+import java.util.Locale;
+
 import me.asu.ta.Agg;
 import me.asu.ta.Side;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 public class CommonUtils {
     /**
@@ -215,54 +213,6 @@ public class CommonUtils {
     }
 
     /**
-     * 解析命令行参数，支持 `--k v` 与 `--flag`。
-     */
-    public static Map<String, String> parseArgs(String[] args) {
-        Map<String, String> m = new HashMap<>();
-        for (int i = 0; i < args.length; i++) {
-            String a = args[i];
-            if (a.startsWith("--")) {
-                String v = (i + 1 < args.length && !args[i + 1].startsWith("--")) ? args[++i] : "true";
-                m.put(a, v);
-            }
-        }
-        return m;
-    }
-
-    /**
-     * 获取必填参数；缺失时抛异常。
-     */
-    public static String require(Map<String, String> args, String key) {
-        String v = args.get(key);
-        if (v == null || v.isBlank()) throw new IllegalArgumentException("Missing arg: " + key);
-        return v;
-    }
-
-    /**
-     * 读取布尔参数，未提供时使用默认值。
-     */
-    public static boolean bool(Map<String, String> m, String k, boolean dv) {
-        if (!m.containsKey(k)) return dv;
-        return parseBool(m.get(k).trim());
-    }
-
-    /**
-     * 读取整型参数，未提供时使用默认值。
-     */
-    public static int intv(Map<String, String> m, String k, int d) {
-        return m.containsKey(k) ? parseInt(m.get(k)) : d;
-    }
-
-    /**
-     * 基于 sum/sumSq/n 计算标准差（double 计数版）。
-     */
-    public static double std(double sum, double sumSq, double n) {
-        if (n <= 1) return 0;
-        double mean = sum / n;
-        return Math.sqrt((sumSq / n) - mean * mean);
-    }
-
-    /**
      * 计算 z-score；std 为 0 时返回 0 防止除零。
      */
     public static double zscore(double accountMean, double globalMean, double globalStd) {
@@ -271,7 +221,7 @@ public class CommonUtils {
     }
 
     /**
-     * 计算指定方向的一笔 markout（方向化）；未来价格缺失时返回 0。
+     * 计算指定方向的一笔 markout（方向化）；未来价格缺失时返回 null。
      * BUY 看上涨收益，SELL 看下跌收益。
      * 统一处理 null 情况，返回 Double 类型方便在 markout 数组中使用。
      */
@@ -290,10 +240,27 @@ public class CommonUtils {
     /**
      * 基于 long n 的标准差计算。
      */
-    public static double std(double sum, double sumSq, long n) {
+   public static double std(double sum, double sumSq, long n) {
         if (n <= 1) return 0;
         double m = sum / n;
-        return Math.sqrt((sumSq / n) - m * m);
+        double variance = (sumSq / n) - m * m;
+        return Math.sqrt(Math.max(0.0, variance));
+    }
+
+    /**
+     * 基于 sum/sumSq/n 计算标准差（double 计数版）。
+     */
+    public static double std(double sum, double sumSq, double n) {
+        if (n <= 1) return 0;
+        double mean = sum / n;
+        double variance = (sumSq / n) - mean * mean;
+        return Math.sqrt(Math.max(0.0, variance));
+    }
+
+    public static double sampleStd(double sum, double sumSq, long n) {
+        if (n <= 1) return 0;
+        double variance = (sumSq - (sum * sum) / n) / (n - 1);
+        return Math.sqrt(Math.max(0.0, variance));
     }
 
     /**

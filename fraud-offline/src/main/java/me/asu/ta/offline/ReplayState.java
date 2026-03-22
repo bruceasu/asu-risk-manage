@@ -7,12 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Data;
 import me.asu.ta.Agg;
 import me.asu.ta.DetailRow;
 import me.asu.ta.LongSamples;
 
-@Data
 public class ReplayState {
     public final Agg globalAgg = new Agg();
     public final List<DetailRow> detailRows = new ArrayList<>(200_000);
@@ -26,4 +24,11 @@ public class ReplayState {
     // 新增：存储每个账户的bot检测追踪器
     public final Map<String, OfflineAccountTracker> accountTrackers = new HashMap<>();
 
+    public Agg getGlobalAgg() { return globalAgg; }
+    public List<DetailRow> getDetailRows() { return detailRows; }
+    public Map<String, Agg> getAggByAccountSymbol() { return aggByAccountSymbol; }
+    public Map<String, Agg> getAggByAccount() { return aggByAccount; }
+    public Map<String, Agg> getBuckets() { return buckets; }
+    public Map<String, LongSamples> getQuoteAgeSamples() { return quoteAgeSamples; }
+    public Map<String, OfflineAccountTracker> getAccountTrackers() { return accountTrackers; }
 }

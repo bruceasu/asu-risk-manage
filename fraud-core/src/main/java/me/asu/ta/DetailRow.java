@@ -8,7 +8,7 @@ public class DetailRow {
     public final String symbol;
     public final String side;
     public final long execTimeMs;
-    public final double size;
+    public final double volume;
     public final double mid0;
     public final long lastQuoteT0;
     public final long quoteAgeMs;
@@ -22,13 +22,13 @@ public class DetailRow {
     public Integer clientIPCount;
     public String clientTypes;
 
-    public DetailRow(String account, String symbol, String side, long execTimeMs, double size,
+    public DetailRow(String account, String symbol, String side, long execTimeMs, double volume,
             double mid0, long lastQuoteT0, long quoteAgeMs) {
         this.account = account;
         this.symbol = symbol;
         this.side = side;
         this.execTimeMs = execTimeMs;
-        this.size = size;
+        this.volume = volume;
         this.mid0 = mid0;
         this.lastQuoteT0 = lastQuoteT0;
         this.quoteAgeMs = quoteAgeMs;

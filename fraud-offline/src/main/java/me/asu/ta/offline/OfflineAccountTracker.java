@@ -49,9 +49,9 @@ public final class OfflineAccountTracker {
         }
     }
 
-    public void addOrderSize(double size) {
-        if (size > 0) {
-            sizeAnalyzer.add(BigDecimal.valueOf(size));
+    public void addOrderVolume(double volume) {
+        if (volume > 0) {
+            sizeAnalyzer.add(BigDecimal.valueOf(volume));
         }
     }
 

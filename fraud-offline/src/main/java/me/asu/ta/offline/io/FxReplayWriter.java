@@ -64,7 +64,7 @@ public class FxReplayWriter {
                     "cv", "botScore", "entropy", "tpslRatio", "clientIPs", "clientTypes"});
             for (DetailRow dr : rows) {
                 writer.writeRecord(new String[]{dr.account, dr.symbol, dr.side,
-                        Long.toString(dr.execTimeMs), me.asu.ta.util.CommonUtils.fmt6(dr.size), me.asu.ta.util.CommonUtils.fmt8(dr.mid0),
+                        Long.toString(dr.execTimeMs), me.asu.ta.util.CommonUtils.fmt6(dr.volume), me.asu.ta.util.CommonUtils.fmt8(dr.mid0),
                         Long.toString(dr.lastQuoteT0), Long.toString(dr.quoteAgeMs),
                         me.asu.ta.util.CommonUtils.fmt8(dr.mids[0]), me.asu.ta.util.CommonUtils.fmt8(dr.marks[0]),
                         me.asu.ta.util.CommonUtils.fmt8(dr.mids[1]), me.asu.ta.util.CommonUtils.fmt8(dr.marks[1]),

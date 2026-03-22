@@ -3,20 +3,20 @@ package me.asu.ta.offline;
 import java.nio.file.Path;
 
 public final class OutputOptions {
-    private final Path detail;
-    private final Path aggAccountSymbol;
-    private final Path aggAccount;
-    private final Path bucket;
-    private final Path quoteAge;
-    private final Path baseline;
-    private final Path cluster;
-    private final Path report;
-    private final Path chart;
-    private final Path botIndicators;
-    private final Path behaviorFeatures;
-    private final Path behaviorClusters;
-    private final Path similarityEdges;
-    private final Path behaviorReport;
+    public final Path detail;
+    public final Path aggAccountSymbol;
+    public final Path aggAccount;
+    public final Path bucket;
+    public final Path quoteAge;
+    public final Path baseline;
+    public final Path cluster;
+    public final Path report;
+    public final Path chart;
+    public final Path botIndicators;
+    public final Path behaviorFeatures;
+    public final Path behaviorClusters;
+    public final Path similarityEdges;
+    public final Path behaviorReport;
 
     OutputOptions(
             Path detail,
@@ -49,59 +49,19 @@ public final class OutputOptions {
         this.behaviorReport = behaviorReport;
     }
 
-    public Path getDetail() {
-        return detail;
-    }
+    public Path getDetail() { return detail; }
+    public Path getAggAccountSymbol() { return aggAccountSymbol; }
+    public Path getAggAccount() { return aggAccount; }
+    public Path getBucket() { return bucket; }
+    public Path getQuoteAge() { return quoteAge; }
+    public Path getBaseline() { return baseline; }
+    public Path getCluster() { return cluster; }
+    public Path getReport() { return report; }
+    public Path getChart() { return chart; }
+    public Path getBotIndicators() { return botIndicators; }
+    public Path getBehaviorFeatures() { return behaviorFeatures; }
+    public Path getBehaviorClusters() { return behaviorClusters; }
+    public Path getSimilarityEdges() { return similarityEdges; }
+    public Path getBehaviorReport() { return behaviorReport; }
 
-    public Path getAggAccountSymbol() {
-        return aggAccountSymbol;
-    }
-
-    public Path getAggAccount() {
-        return aggAccount;
-    }
-
-    public Path getBucket() {
-        return bucket;
-    }
-
-    public Path getQuoteAge() {
-        return quoteAge;
-    }
-
-    public Path getBaseline() {
-        return baseline;
-    }
-
-    public Path getCluster() {
-        return cluster;
-    }
-
-    public Path getReport() {
-        return report;
-    }
-
-    public Path getChart() {
-        return chart;
-    }
-
-    public Path getBotIndicators() {
-        return botIndicators;
-    }
-
-    public Path getBehaviorFeatures() {
-        return behaviorFeatures;
-    }
-
-    public Path getBehaviorClusters() {
-        return behaviorClusters;
-    }
-
-    public Path getSimilarityEdges() {
-        return similarityEdges;
-    }
-
-    public Path getBehaviorReport() {
-        return behaviorReport;
-    }
 }
